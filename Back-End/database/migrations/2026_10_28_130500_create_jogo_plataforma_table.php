@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('game_platform', function (Blueprint $table) {
-            $table->foreignId('game_id')->constrained()->cascadeOnDelete();
+        Schema::create('jogo_plataforma', function (Blueprint $table) {
+            $table->foreignId('game_id')->constrained('jogos')->cascadeOnDelete();
             // Uma plataforma ainda usada por algum jogo não pode ser excluída
-            $table->foreignId('platform_id')->constrained()->restrictOnDelete();
+            $table->foreignId('platform_id')->constrained('plataformas')->restrictOnDelete();
 
             $table->primary(['game_id', 'platform_id']);
         });
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('game_platform');
+        Schema::dropIfExists('jogo_plataforma');
     }
 };

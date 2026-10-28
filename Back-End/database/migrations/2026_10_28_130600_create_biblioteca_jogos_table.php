@@ -12,11 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_games', function (Blueprint $table) {
+        Schema::create('biblioteca_jogos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('usuarios')->cascadeOnDelete();
             // Um jogo que está na biblioteca de alguém não pode ser excluído
-            $table->foreignId('game_id')->constrained()->restrictOnDelete();
+            $table->foreignId('game_id')->constrained('jogos')->restrictOnDelete();
             // Quero jogar, Jogando, Pausado, Concluído e Abandonado
             $table->enum('status', ['want_to_play', 'playing', 'paused', 'completed', 'abandoned'])
                 ->default('want_to_play');
@@ -29,8 +29,8 @@ return new class extends Migration
         });
 
         // O Schema Builder não tem método para CHECK, então as restrições são criadas com SQL
-        DB::statement('ALTER TABLE user_games ADD CONSTRAINT user_games_hours_played_check CHECK (hours_played >= 0)');
-        DB::statement('ALTER TABLE user_games ADD CONSTRAINT user_games_rating_check CHECK (rating IS NULL OR rating BETWEEN 1 AND 5)');
+        DB::statement('ALTER TABLE biblioteca_jogos ADD CONSTRAINT biblioteca_jogos_hours_played_check CHECK (hours_played >= 0)');
+        DB::statement('ALTER TABLE biblioteca_jogos ADD CONSTRAINT biblioteca_jogos_rating_check CHECK (rating IS NULL OR rating BETWEEN 1 AND 5)');
     }
 
     /**
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_games');
+        Schema::dropIfExists('biblioteca_jogos');
     }
 };

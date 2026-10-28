@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('platforms', function (Blueprint $table) {
+        Schema::create('jogos', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50)->unique();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->date('release_date')->nullable();
+            $table->string('cover_url')->nullable();
             $table->timestamps();
         });
     }
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('platforms');
+        Schema::dropIfExists('jogos');
     }
 };

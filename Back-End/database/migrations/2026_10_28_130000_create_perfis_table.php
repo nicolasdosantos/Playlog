@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('games', function (Blueprint $table) {
+        Schema::create('perfis', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->date('release_date')->nullable();
-            $table->string('cover_url')->nullable();
+            // unique() garante o relacionamento 1:1: cada usuário tem no máximo um perfil
+            $table->foreignId('user_id')->unique()->constrained('usuarios')->cascadeOnDelete();
+            $table->string('bio', 500)->nullable();
+            $table->string('avatar_url')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('games');
+        Schema::dropIfExists('perfis');
     }
 };

@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profiles', function (Blueprint $table) {
+        Schema::create('generos', function (Blueprint $table) {
             $table->id();
-            // unique() garante o relacionamento 1:1: cada usuário tem no máximo um perfil
-            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
-            $table->string('bio', 500)->nullable();
-            $table->string('avatar_url')->nullable();
+            $table->string('name', 50)->unique();
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profiles');
+        Schema::dropIfExists('generos');
     }
 };
