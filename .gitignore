@@ -1,0 +1,39 @@
+# Variáveis de ambiente e credenciais
+.env
+.env.*
+!.env.example
+auth.json
+
+# Dependências
+node_modules/
+vendor/
+
+# Front-End (React + Vite)
+Front-End/dist/
+*.local
+
+# Back-End (Laravel)
+Back-End/public/build
+Back-End/public/hot
+Back-End/public/storage
+Back-End/storage/*.key
+Back-End/.phpunit.result.cache
+Back-End/.phpunit.cache
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporários
+*.tmp
+*.swp
+*~
+
+# Editores e sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Configuração local do mise (o mise.toml do projeto é versionado)
+mise.local.toml
