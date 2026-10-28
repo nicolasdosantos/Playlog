@@ -1,19 +1,46 @@
-/* Paleta e medidas compartilhadas por toda a interface do Playlog */
+/* Identidade visual do Playlog: preto de verdade, marinho nas superfícies e amarelo-dourado como destaque */
 :root {
-  --color-bg: #080b12;
-  --color-bg-secondary: #0d1220;
-  --color-surface: #131b2b;
-  --color-surface-raised: #1b263a;
-  --color-accent: #42638a;
-  --color-text: #e8ecf3;
-  --color-text-muted: #929db0;
-  --color-gold: #c5a15b;
+  --color-bg: #000000;
+  --color-bg-alt: #080808;
+  --color-bg-secondary: #07111f;
+  --color-surface: #0b1626;
+  --color-surface-raised: #11203a;
+  --color-border: #1b2a3d;
+  --color-border-strong: #2a3a50;
+  --color-text: #f5f5f5;
+  --color-text-muted: #a1a8b3;
+  --color-text-subtle: #7b828d;
 
-  --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Dourado: só em ações principais, estados ativos, foco, seleção e detalhes da marca */
+  --color-accent: #e0b52f;
+  --color-accent-strong: #f2cb55;
+  --color-on-accent: #141000;
+  --color-accent-soft: rgb(224 181 47 / 9%);
+  --color-accent-line: rgb(224 181 47 / 45%);
+  --color-focus-ring: rgb(224 181 47 / 30%);
+
+  --color-danger: #f07b74;
+  --color-danger-soft: rgb(240 123 116 / 10%);
+  --color-danger-ring: rgb(240 123 116 / 24%);
+  --color-on-danger: #2a0d0b;
+  --color-success: #6fd6a8;
+  --color-success-soft: rgb(111 214 168 / 10%);
+  --color-on-success: #0b2a1f;
+
+  /* Tons das capas geradas quando o jogo não tem imagem */
+  --poster-1: #0f2240;
+  --poster-2: #1b1b1d;
+  --poster-3: #0b2a31;
+  --poster-4: #2e0f17;
+  --poster-5: #121c2b;
+
+  --font-display: 'Anybody', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -21,9 +48,14 @@
   --space-4: 1.5rem;
   --space-5: 2rem;
   --space-6: 3rem;
+  --space-7: 4.5rem;
 
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-fast: 140ms var(--ease-out);
+  --transition-base: 240ms var(--ease-out);
+
+  --shadow-lift: 0 18px 40px -18px rgb(0 0 0 / 90%);
+  --shadow-button: 0 10px 22px -14px rgb(0 0 0 / 90%);
 
   color-scheme: dark;
 }
@@ -39,8 +71,9 @@ body {
   min-height: 100vh;
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-family);
-  line-height: 1.5;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -49,6 +82,14 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.05;
 }
 
 img {
@@ -65,8 +106,8 @@ textarea {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
