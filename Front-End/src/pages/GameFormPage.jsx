@@ -1,18 +1,42 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Cover from '../components/Cover'
 import Field from '../components/Field'
 import Icon from '../components/Icon'
+import StatusBadge from '../components/StatusBadge'
+import { STATUSES } from '../library'
 import { api } from '../services/api'
 
-// Os erros das listas chegam como "genres.0", "genres.1"...; mostra o primeiro de cada lista
-function listError(errors, name) {
-  const key = Object.keys(errors).find((field) => field === name || field.startsWith(`${name}.`))
-  return key ? errors[key][0] : null
+const EMPTY_FORM = {
+  title: '',
+  description: '',
+  release_date: '',
+  cover_url: '',
+  genres: [],
+  platforms: [],
+  status: 'want_to_play',
+  hours_played: '0',
+  rating: '',
 }
 
-function OptionGroup({ legend, options, selected, onToggle, error, emptyText }) {
+// Converte a entrada que vem da API para os valores dos campos do formulário
+function formFromEntry(entry) {
+  return {
+    title: entry.game.title,
+    description: entry.game.description ?? '',
+    release_date: entry.game.release_date ?? '',
+    cover_url: entry.game.cover_url ?? '',
+    genres: entry.game.genres.map((genre) => genre.id),
+    platforms: entry.game.platforms.map((platform) => platform.id),
+    status: entry.status,
+    hours_played: String(entry.hours_played).replace('.', ','),
+    rating: entry.rating === null ? '' : String(entry.rating),
+  }
+}
+
+function OptionGroup({ legend, options, selected, onToggle, emptyText }) {
   return (
-    <fieldset className={`options${error ? ' options--error' : ''}`}>
+    <fieldset className="options">
       <legend className="field__label">{legend}</legend>
       {options.length === 0 ? (
         <p className="field__hint">{emptyText}</p>
@@ -35,24 +59,24 @@ function OptionGroup({ legend, options, selected, onToggle, error, emptyText }) 
           ))}
         </div>
       )}
-      {error && <span className="field__error">{error}</span>}
     </fieldset>
   )
 }
 
-function GameFormPage({ game, onSaved, onCancel }) {
-  const editing = Boolean(game)
-  const [form, setForm] = useState({
-    title: game?.title ?? '',
-    description: game?.description ?? '',
-    release_date: game?.release_date ?? '',
-    cover_url: game?.cover_url ?? '',
-    genres: game?.genres.map((genre) => genre.id) ?? [],
-    platforms: game?.platforms.map((platform) => platform.id) ?? [],
-  })
+function GameFormPage() {
+  const { id } = useParams()
+  const editing = Boolean(id)
+  const navigate = useNavigate()
+  const location = useLocation()
+  // Volta para a biblioteca com os mesmos filtros de antes, quando vier dela
+  const backTo = location.state?.back ?? '/'
+
+  const [form, setForm] = useState(EMPTY_FORM)
+  // A prévia da capa só muda quando a pessoa sai do campo, e não a cada letra digitada na URL
+  const [coverPreview, setCoverPreview] = useState('')
   const [options, setOptions] = useState({ genres: [], platforms: [] })
-  const [optionsLoading, setOptionsLoading] = useState(true)
-  const [optionsError, setOptionsError] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null)
   const [errors, setErrors] = useState({})
   const [message, setMessage] = useState('')
   const messageRef = useRef(null)
@@ -61,21 +85,26 @@ function GameFormPage({ game, onSaved, onCancel }) {
   useEffect(() => {
     let ignore = false
 
-    Promise.all([api.listGenres(), api.listPlatforms()])
-      .then(([genres, platforms]) => {
-        if (!ignore) setOptions({ genres: genres.data, platforms: platforms.data })
+    Promise.all([api.listGenres(), api.listPlatforms(), editing ? api.getEntry(id) : null])
+      .then(([genres, platforms, entryData]) => {
+        if (ignore) return
+        setOptions({ genres: genres.data, platforms: platforms.data })
+        if (entryData) {
+          setForm(formFromEntry(entryData.entry))
+          setCoverPreview(entryData.entry.game.cover_url ?? '')
+        }
       })
       .catch((error) => {
-        if (!ignore) setOptionsError(error.message)
+        if (!ignore) setLoadError(error)
       })
       .finally(() => {
-        if (!ignore) setOptionsLoading(false)
+        if (!ignore) setLoading(false)
       })
 
     return () => {
       ignore = true
     }
-  }, [])
+  }, [editing, id])
 
   // O aviso fica acima do formulário: quem enviou lá de baixo (no celular) precisa conseguir vê-lo
   useEffect(() => {
@@ -88,11 +117,10 @@ function GameFormPage({ game, onSaved, onCancel }) {
     setErrors({ ...errors, [event.target.name]: undefined })
   }
 
-  function toggle(list, id) {
-    const values = form[list].includes(id) ? form[list].filter((value) => value !== id) : [...form[list], id]
+  // Marca ou desmarca um gênero/plataforma
+  function toggle(list, optionId) {
+    const values = form[list].includes(optionId) ? form[list].filter((value) => value !== optionId) : [...form[list], optionId]
     setForm({ ...form, [list]: values })
-    // Os erros da lista chegam como "genres", "genres.0"...; somem quando a seleção muda
-    setErrors(Object.fromEntries(Object.entries(errors).filter(([field]) => field !== list && !field.startsWith(`${list}.`))))
   }
 
   async function handleSubmit(event) {
@@ -106,16 +134,19 @@ function GameFormPage({ game, onSaved, onCancel }) {
       description: form.description || null,
       release_date: form.release_date || null,
       cover_url: form.cover_url || null,
+      // Aceita vírgula ou ponto (12,5 ou 12.5); a API espera ponto
+      hours_played: form.hours_played === '' ? 0 : form.hours_played.replace(',', '.'),
+      rating: form.rating === '' ? null : Number(form.rating),
     }
 
     try {
       if (editing) {
-        await api.updateGame(game.id, data)
-        onSaved(`Alterações salvas em "${data.title}".`)
+        await api.updateEntry(id, data)
       } else {
-        await api.createGame(data)
-        onSaved(`"${data.title}" foi adicionado ao catálogo.`)
+        await api.createEntry(data)
       }
+      const text = editing ? `Alterações salvas em "${data.title}".` : `"${data.title}" foi adicionado à sua biblioteca.`
+      navigate(backTo, { state: { notice: { type: 'success', text } } })
     } catch (error) {
       setErrors(error.errors)
       setMessage(error.message)
@@ -123,25 +154,32 @@ function GameFormPage({ game, onSaved, onCancel }) {
     }
   }
 
-  // A prévia só tenta carregar endereços que já parecem completos, para não buscar a cada letra digitada
-  const previewUrl = /^https?:\/\/[^/\s]+\.[^/\s]+\/\S+/.test(form.cover_url) ? form.cover_url : null
-  const previewYear = form.release_date ? form.release_date.slice(0, 4) : null
+  if (loadError) {
+    const notFound = loadError.status === 404
+    return (
+      <div className="state state--error" role="alert">
+        <p className="state__title">{notFound ? 'Jogo não encontrado.' : 'Não foi possível abrir o formulário.'}</p>
+        <p>{notFound ? 'Ele pode ter sido excluído ou não pertence à sua biblioteca.' : loadError.message}</p>
+        <Link to="/" className="button">
+          Voltar à biblioteca
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <section className="form-page" aria-labelledby="form-title">
-      <button type="button" className="back-link" onClick={onCancel}>
+      <Link to={backTo} className="back-link">
         <Icon name="chevronLeft" size={16} />
-        Voltar ao catálogo
-      </button>
+        Voltar à biblioteca
+      </Link>
 
       <div className="page-header">
         <div>
           <h1 id="form-title" className="page-header__title">
             {editing ? 'Editar jogo' : 'Novo jogo'}
           </h1>
-          <p className="page-header__subtitle">
-            {editing ? 'As alterações valem para todo o catálogo.' : 'Só o título é obrigatório; o resto pode ser preenchido depois.'}
-          </p>
+          <p className="page-header__subtitle">Só o título é obrigatório; o resto pode ser preenchido depois.</p>
         </div>
       </div>
 
@@ -151,12 +189,63 @@ function GameFormPage({ game, onSaved, onCancel }) {
         </p>
       )}
 
-      {/* O formulário só aparece depois de carregar as opções, para os botões não mudarem de lugar durante o uso */}
-      {optionsLoading && <p className="state">Carregando gêneros e plataformas…</p>}
+      {loading && (
+        <div className="game-form" aria-busy="true" aria-label="Carregando formulário">
+          <div className="game-form__fields">
+            <div className="skeleton skeleton--field" />
+            <div className="skeleton skeleton--field skeleton--tall" />
+            <div className="skeleton skeleton--field" />
+          </div>
+          <div className="skeleton skeleton--cover" />
+        </div>
+      )}
 
-      {!optionsLoading && (
+      {!loading && (
         <form className="game-form" onSubmit={handleSubmit} noValidate>
           <div className="game-form__fields">
+            <h2 className="game-form__section">Seu progresso</h2>
+
+            <fieldset className="options">
+              <legend className="field__label">Status</legend>
+              <div className="options__list">
+                {STATUSES.map((option) => (
+                  <label key={option.value} className={`option option--status option--${option.value}`}>
+                    <input
+                      className="option__input"
+                      type="radio"
+                      name="status"
+                      value={option.value}
+                      checked={form.status === option.value}
+                      onChange={handleChange}
+                    />
+                    <span className="status__dot" aria-hidden="true" />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.status && <span className="field__error">{errors.status[0]}</span>}
+            </fieldset>
+
+            <div className="form__row">
+              <Field label="Horas jogadas" hint="Até uma casa decimal, ex.: 12,5." error={errors.hours_played?.[0]}>
+                {/* Campo de texto: o type="number" descarta a vírgula quando o navegador está em inglês (12,5 virava 125) */}
+                <input className="input" name="hours_played" inputMode="decimal" value={form.hours_played} onChange={handleChange} />
+              </Field>
+
+              <Field label="Sua nota" hint="De 0 a 10, quanto você gostou do jogo." error={errors.rating?.[0]}>
+                <select className="input" name="rating" value={form.rating} onChange={handleChange}>
+                  <option value="">Sem nota</option>
+                  {Array.from({ length: 11 }, (_, nota) => (
+                    <option key={nota} value={nota}>
+                      {nota}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+
+            <h2 className="game-form__section">Dados do jogo</h2>
+
             <Field label="Título" error={errors.title?.[0]}>
               <input className="input input--title" name="title" maxLength={255} value={form.title} onChange={handleChange} required />
             </Field>
@@ -186,41 +275,30 @@ function GameFormPage({ game, onSaved, onCancel }) {
                   placeholder="https://"
                   value={form.cover_url}
                   onChange={handleChange}
+                  onBlur={() => setCoverPreview(form.cover_url)}
                 />
               </Field>
             </div>
 
-            {optionsError && (
-              <p className="alert alert--error" role="alert">
-                Não foi possível carregar gêneros e plataformas: {optionsError}
-              </p>
-            )}
-
-            {!optionsError && (
-              <>
-                <OptionGroup
-                  legend="Gêneros"
-                  options={options.genres}
-                  selected={form.genres}
-                  onToggle={(id) => toggle('genres', id)}
-                  error={listError(errors, 'genres')}
-                  emptyText="Ainda não há gêneros cadastrados no sistema. O jogo pode ser salvo sem eles."
-                />
-                <OptionGroup
-                  legend="Plataformas"
-                  options={options.platforms}
-                  selected={form.platforms}
-                  onToggle={(id) => toggle('platforms', id)}
-                  error={listError(errors, 'platforms')}
-                  emptyText="Ainda não há plataformas cadastradas no sistema. O jogo pode ser salvo sem elas."
-                />
-              </>
-            )}
+            <OptionGroup
+              legend="Gêneros"
+              options={options.genres}
+              selected={form.genres}
+              onToggle={(optionId) => toggle('genres', optionId)}
+              emptyText="Ainda não há gêneros cadastrados no sistema. O jogo pode ser salvo sem eles."
+            />
+            <OptionGroup
+              legend="Plataformas"
+              options={options.platforms}
+              selected={form.platforms}
+              onToggle={(optionId) => toggle('platforms', optionId)}
+              emptyText="Ainda não há plataformas cadastradas no sistema. O jogo pode ser salvo sem elas."
+            />
 
             <div className="form__actions">
-              <button type="button" className="button button--ghost" onClick={onCancel} disabled={sending}>
+              <Link to={backTo} className="button button--ghost">
                 Cancelar
-              </button>
+              </Link>
               <button type="submit" className="button button--primary" disabled={sending}>
                 {sending ? 'Salvando…' : editing ? 'Salvar alterações' : 'Adicionar jogo'}
               </button>
@@ -228,10 +306,14 @@ function GameFormPage({ game, onSaved, onCancel }) {
           </div>
 
           <aside className="game-form__preview" aria-label="Prévia do card">
-            <p className="game-form__preview-label">Como vai aparecer no catálogo</p>
-            <Cover title={form.title} url={previewUrl} className="game-form__cover" />
+            <p className="game-form__preview-label">Prévia</p>
+            {/* Se a URL não for uma imagem válida, o Cover mostra a capa com o título */}
+            <Cover title={form.title} url={coverPreview} className="game-form__cover" />
             <p className="game-form__preview-title">{form.title.trim() || 'Sem título'}</p>
-            <p className="game-form__preview-meta">{previewYear ?? 'Sem data'}</p>
+            <div className="game-form__preview-meta">
+              <StatusBadge status={form.status} />
+              <span>{form.rating === '' ? 'Sem nota' : `${form.rating}/10`}</span>
+            </div>
           </aside>
         </form>
       )}

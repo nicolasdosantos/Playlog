@@ -2,17 +2,25 @@
 
 namespace App\Http\Requests;
 
+use App\Models\UserGame;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class GameRequest extends FormRequest
+// Dados do jogo e dados pessoais da entrada (status, horas e nota).
+// user_id e game_id não estão nas regras, então não podem ser enviados pelo cliente.
+class LibraryEntryRequest extends FormRequest
 {
+    private const GAME_FIELDS = ['title', 'description', 'release_date', 'cover_url'];
+
+    private const ENTRY_FIELDS = ['status', 'hours_played', 'rating'];
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // O acesso já é controlado pelo middleware auth:sanctum nas rotas
+        // O token é exigido nas rotas e o controller só busca entradas do próprio usuário
         return true;
     }
 
@@ -37,6 +45,11 @@ class GameRequest extends FormRequest
             'genres.*' => ['integer', 'distinct', 'exists:generos,id'],
             'platforms' => ['sometimes', 'array'],
             'platforms.*' => ['integer', 'distinct', 'exists:plataformas,id'],
+            // Opcionais: no cadastro valem os padrões (Quero jogar, 0 h, sem nota); na edição, mantêm o valor atual
+            'status' => ['sometimes', 'required', Rule::in(UserGame::STATUSES)],
+            'hours_played' => ['sometimes', 'required', 'numeric', 'decimal:0,1', 'min:0', 'max:99999.9'],
+            // numeric recusa true/false, que o integer sozinho aceitaria como 1 e 0
+            'rating' => ['sometimes', 'nullable', 'numeric', 'integer', 'between:0,10'],
         ];
     }
 
@@ -49,10 +62,19 @@ class GameRequest extends FormRequest
             'date_format' => 'O campo :attribute deve estar no formato AAAA-MM-DD.',
             'url' => 'O campo :attribute deve ser um endereço válido começando com http:// ou https://.',
             'array' => 'O campo :attribute deve ser uma lista.',
-            'integer' => 'Cada item de :attribute deve ser um número inteiro.',
             'distinct' => 'A lista de :attribute tem itens repetidos.',
+            'genres.*.integer' => 'Cada item de gêneros deve ser um número inteiro.',
+            'platforms.*.integer' => 'Cada item de plataformas deve ser um número inteiro.',
             'genres.*.exists' => 'O gênero informado não existe.',
             'platforms.*.exists' => 'A plataforma informada não existe.',
+            'status.in' => 'Escolha um status válido: Quero jogar, Jogando, Pausado, Concluído ou Abandonado.',
+            'hours_played.numeric' => 'As horas jogadas devem ser um número.',
+            'hours_played.decimal' => 'As horas jogadas devem ter no máximo uma casa decimal.',
+            'hours_played.min' => 'As horas jogadas não podem ser negativas.',
+            'hours_played.max' => 'As horas jogadas devem ser no máximo 99999,9.',
+            'rating.numeric' => 'A nota deve ser um número inteiro de 0 a 10.',
+            'rating.integer' => 'A nota deve ser um número inteiro de 0 a 10.',
+            'rating.between' => 'A nota deve ser um número inteiro de 0 a 10.',
         ];
     }
 
@@ -67,6 +89,21 @@ class GameRequest extends FormRequest
             'genres.*' => 'gêneros',
             'platforms' => 'plataformas',
             'platforms.*' => 'plataformas',
+            'status' => 'status',
+            'hours_played' => 'horas jogadas',
+            'rating' => 'nota',
         ];
+    }
+
+    // Campos da tabela jogos que vieram na requisição
+    public function gameData(): array
+    {
+        return $this->safe()->only(self::GAME_FIELDS);
+    }
+
+    // Campos da tabela biblioteca_jogos que vieram na requisição
+    public function entryData(): array
+    {
+        return $this->safe()->only(self::ENTRY_FIELDS);
     }
 }

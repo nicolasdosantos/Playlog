@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['title', 'description', 'release_date', 'cover_url'])]
 #[Table('jogos')]
@@ -29,15 +29,9 @@ class Game extends Model
         return $this->belongsToMany(Platform::class, 'jogo_plataforma');
     }
 
-    public function userGames(): HasMany
+    // Cada jogo pertence a uma única entrada da biblioteca, que indica quem é o dono
+    public function libraryEntry(): HasOne
     {
-        return $this->hasMany(UserGame::class);
-    }
-
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'biblioteca_jogos')
-            ->withPivot('id', 'status', 'hours_played', 'rating', 'comment')
-            ->withTimestamps();
+        return $this->hasOne(UserGame::class);
     }
 }

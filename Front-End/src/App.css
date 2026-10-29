@@ -75,10 +75,16 @@
   gap: var(--space-6);
 }
 
+.header__brand {
+  display: flex;
+  align-items: center;
+}
+
 .header__nav {
   flex: 1;
   align-self: stretch;
   display: flex;
+  gap: var(--space-5);
 }
 
 .header__link {
@@ -86,10 +92,16 @@
   display: flex;
   align-items: center;
   font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.header__link:hover,
+.header__link[aria-current='page'] {
   color: var(--color-text);
 }
 
-/* Barra ultravioleta colada na borda inferior do cabeçalho marca a página atual */
+/* Barra dourada colada na borda inferior do cabeçalho marca a página atual */
 .header__link[aria-current='page']::after {
   content: '';
   position: absolute;
@@ -185,48 +197,24 @@
 }
 
 .button--small {
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   padding: 0 0.8rem;
   font-size: 0.875rem;
 }
 
-.button--full {
-  width: 100%;
-}
-
-.icon-button {
-  display: grid;
-  place-items: center;
-  width: 2.3rem;
-  height: 2.3rem;
-  border: 1px solid rgb(255 255 255 / 12%);
-  border-radius: var(--radius-md);
-  background-color: rgb(0 0 0 / 72%);
-  color: var(--color-text);
-  backdrop-filter: blur(8px);
-  cursor: pointer;
-  transition:
-    background-color var(--transition-fast),
-    color var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.icon-button:hover:not(:disabled) {
-  background-color: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
-.icon-button--danger:hover:not(:disabled) {
+.button--danger {
   background-color: var(--color-danger);
+  border-color: var(--color-danger);
   color: var(--color-on-danger);
 }
 
-.icon-button:active:not(:disabled) {
-  transform: scale(0.92);
+.button--danger:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger), white 12%);
 }
 
-.icon-button:disabled {
-  cursor: progress;
+.button--full {
+  width: 100%;
 }
 
 .link-button,
@@ -321,7 +309,7 @@
   border-color: var(--color-border-strong);
 }
 
-/* Foco: borda + anel ultravioleta de 3px */
+/* Foco: borda + anel dourado de 3px */
 .input:focus {
   outline: none;
   border-color: var(--color-accent);
@@ -521,7 +509,9 @@
 
 .toast__text {
   flex: 1;
+  min-width: 0;
   font-size: 0.93rem;
+  overflow-wrap: anywhere;
 }
 
 .toast__close {
@@ -687,6 +677,8 @@
 .auth__form-side {
   display: grid;
   place-items: center;
+  align-content: center;
+  gap: var(--space-4);
   padding: var(--space-6) var(--space-5);
 }
 
@@ -738,6 +730,17 @@
 .auth__subtitle {
   margin: 0.85rem 0 var(--space-4);
   color: var(--color-text-muted);
+}
+
+.auth__about {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.auth__about:hover {
+  color: var(--color-text);
 }
 
 .auth__switch {
@@ -885,7 +888,7 @@
   box-shadow: var(--shadow-button);
 }
 
-/* ================= Catálogo ================= */
+/* ================= Biblioteca ================= */
 
 .page-header {
   display: flex;
@@ -907,14 +910,14 @@
   color: var(--color-text-muted);
 }
 
-.catalog__intro {
+.page-intro {
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border);
   margin-bottom: var(--space-5);
 }
 
 /* Título largo e pesado: o nome da tela é a peça tipográfica principal */
-.catalog__title {
+.page-intro__title {
   font-size: clamp(3rem, 9vw, 6.25rem);
   font-weight: 800;
   font-stretch: 135%;
@@ -922,15 +925,15 @@
   letter-spacing: -0.035em;
 }
 
-.catalog__count {
+.page-intro__count {
   margin-top: 0.85rem;
   font-size: 1.05rem;
 }
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(188px, 1fr));
-  gap: var(--space-5) var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
+  gap: var(--space-4);
   transition: opacity var(--transition-base);
 }
 
@@ -938,81 +941,201 @@
   opacity: 0.5;
 }
 
+/* Card do jogo: capa em destaque, status e nota sobre a capa, ações no rodapé */
 .game-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  transition: opacity var(--transition-base);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-alt);
+  animation: card-entrada 320ms var(--ease-out) backwards;
+  transition:
+    transform var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
-.game-card--busy {
-  opacity: 0.45;
+.game-card:hover,
+.game-card:focus-within {
+  transform: translateY(-4px);
+  border-color: var(--color-accent-line);
+  box-shadow: var(--shadow-lift);
+}
+
+/* O foco do teclado no título contorna o card inteiro */
+.game-card:has(.game-card__link:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.game-card__link:focus-visible {
+  outline: none;
 }
 
 .game-card__media {
   position: relative;
-  border-radius: var(--radius-md);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 6%);
-  transition:
-    transform var(--transition-base),
-    box-shadow var(--transition-base);
+  overflow: hidden;
 }
 
-.game-card:hover .game-card__media,
-.game-card:focus-within .game-card__media {
-  transform: translateY(-5px);
-  box-shadow:
-    var(--shadow-lift),
-    0 0 0 1px var(--color-accent-line);
-}
-
-/* Editar e excluir aparecem sobre a capa no hover ou no foco do teclado */
-.game-card__actions {
+/* A base da capa se funde com o fundo do card */
+.game-card__media::after {
+  content: '';
   position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
+  inset: 0;
+  background: linear-gradient(to top, var(--color-bg-alt), transparent 20%);
+  pointer-events: none;
+}
+
+.game-card__cover {
+  border-radius: 0;
+  transition: transform 500ms var(--ease-out);
+}
+
+.game-card:hover .game-card__cover {
+  transform: scale(1.04);
+}
+
+.game-card__status {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 1;
+}
+
+.game-card__rating {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 1;
   display: flex;
-  gap: 0.4rem;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition:
-    opacity var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.game-card:hover .game-card__actions,
-.game-card:focus-within .game-card__actions {
-  opacity: 1;
-  transform: none;
-}
-
-.game-card__body {
-  display: grid;
-  gap: 0.35rem;
-  padding-top: 0.85rem;
-}
-
-.game-card__title {
-  font-size: 1.08rem;
-  font-weight: 700;
-  font-stretch: 100%;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-}
-
-/* Ano e plataformas em linhas próprias: com nomes longos, um separador na mesma linha quebraria mal */
-.game-card__meta {
-  display: grid;
+  align-items: baseline;
   gap: 0.1rem;
-  font-size: 0.86rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--color-accent-line);
+  border-radius: var(--radius-pill);
+  background-color: rgb(0 0 0 / 75%);
+  color: var(--color-accent-strong);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.game-card__rating small {
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--color-text-muted);
 }
 
+.game-card__rating--empty {
+  padding: 0.25rem 0.65rem;
+  border-color: var(--color-border-strong);
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.game-card__body {
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  padding: 0.9rem 0.95rem 0.75rem;
+}
+
+/* Títulos longos ficam em no máximo duas linhas */
+.game-card__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-stretch: 100%;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* O link do título cobre o card todo, então clicar em qualquer parte abre a edição */
+.game-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.game-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.85rem;
+  font-size: 0.84rem;
+  color: var(--color-text-muted);
+}
+
+.game-card__hours {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 .game-card__platforms {
-  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
   color: var(--color-text-subtle);
 }
 
+/* As ações ficam acima do link que cobre o card */
+.game-card__actions {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--color-border);
+}
+
+.card-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.card-action + .card-action {
+  border-left: 1px solid var(--color-border);
+}
+
+.card-action:hover {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+.card-action--danger:hover {
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.card-action:focus-visible {
+  outline-offset: -3px;
+}
+
 .tags {
-  margin: 0.25rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
@@ -1026,6 +1149,11 @@
   background-color: var(--color-surface-raised);
   font-size: 0.76rem;
   color: var(--color-text-muted);
+}
+
+.tag--more {
+  background-color: transparent;
+  border: 1px solid var(--color-border-strong);
 }
 
 /* Carregamento: capas vazias com brilho passando */
@@ -1054,7 +1182,7 @@
   width: 45%;
 }
 
-/* Catálogo vazio: uma estante com espaços esperando jogos */
+/* Biblioteca vazia: uma estante com espaços esperando jogos */
 .empty-shelf {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -1120,6 +1248,206 @@
   font-size: 0.92rem;
 }
 
+/* ================= Status ================= */
+
+.status-filter__option--want_to_play,
+.option--want_to_play,
+.status--want_to_play {
+  --status-color: var(--status-want);
+}
+
+.status-filter__option--playing,
+.option--playing,
+.status--playing {
+  --status-color: var(--status-playing);
+}
+
+.status-filter__option--paused,
+.option--paused,
+.status--paused {
+  --status-color: var(--status-paused);
+}
+
+.status-filter__option--completed,
+.option--completed,
+.status--completed {
+  --status-color: var(--status-completed);
+}
+
+.status-filter__option--abandoned,
+.option--abandoned,
+.status--abandoned {
+  --status-color: var(--status-abandoned);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.22rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--status-color) 45%, transparent);
+  border-radius: var(--radius-pill);
+  background-color: rgb(0 0 0 / 75%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status__dot {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--status-color);
+}
+
+/* ================= Busca e filtros ================= */
+
+.library-toolbar {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 440px;
+  min-height: 2.9rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-subtle);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.search-field:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+  color: var(--color-accent);
+}
+
+.search-field input {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.75rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.search-field input::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.status-filter__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* Bolinha com a cor do status ("Todos" não tem) */
+.status-filter__option[class*='--']::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--status-color);
+}
+
+.status-filter__option:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.status-filter__option[aria-pressed='true'] {
+  border-color: var(--color-accent-line);
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+.status-filter__count {
+  min-width: 1.6rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.status-filter__option[aria-pressed='true'] .status-filter__count {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* ================= Diálogo de confirmação ================= */
+
+.dialog {
+  width: min(440px, calc(100vw - 2rem));
+  padding: var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, var(--color-surface), var(--color-bg-secondary));
+  color: var(--color-text);
+  box-shadow: 0 30px 80px -20px rgb(0 0 0 / 90%);
+}
+
+.dialog[open] {
+  animation: toast-entrada 200ms var(--ease-out);
+}
+
+.dialog::backdrop {
+  background-color: rgb(0 0 0 / 72%);
+  backdrop-filter: blur(3px);
+}
+
+.dialog__title {
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+}
+
+.dialog__text {
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.dialog__text strong {
+  color: var(--color-text);
+}
+
+.dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: var(--space-5);
+}
+
 /* ================= Formulário de jogo ================= */
 
 .form-page {
@@ -1168,8 +1496,131 @@
 }
 
 .game-form__preview-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   font-size: 0.86rem;
   color: var(--color-text-muted);
+}
+
+.game-form__section {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-subtle);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.game-form__section:not(:first-child) {
+  margin-top: var(--space-3);
+}
+
+/* Status no formulário: opções de rádio com a cor de cada status */
+.option--status {
+  padding: 0.55rem 0.95rem;
+  min-height: 2.75rem;
+}
+
+.option--status:has(.option__input:checked) {
+  border-color: color-mix(in srgb, var(--status-color) 60%, transparent);
+  background-color: color-mix(in srgb, var(--status-color) 12%, transparent);
+  color: var(--color-text);
+}
+
+select.input {
+  cursor: pointer;
+}
+
+.skeleton--field {
+  height: 3rem;
+}
+
+.skeleton--tall {
+  height: 7rem;
+}
+
+/* ================= Quem somos ================= */
+
+.about__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+.about__heading {
+  margin-bottom: 0.85rem;
+  font-size: 1.35rem;
+  font-stretch: 105%;
+}
+
+.about__heading:not(:first-child) {
+  margin-top: var(--space-5);
+}
+
+.about__text p {
+  max-width: 62ch;
+  color: var(--color-text-muted);
+}
+
+.about__tech,
+.members {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.about__tech li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-alt);
+}
+
+.about__tech strong {
+  color: var(--color-accent-strong);
+}
+
+.about__tech span {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(150deg, var(--color-surface), var(--color-bg-secondary));
+}
+
+.avatar--large {
+  width: 3rem;
+  height: 3rem;
+  border-color: var(--color-accent-line);
+  color: var(--color-accent-strong);
+  font-size: 1rem;
+}
+
+.member__name {
+  font-weight: 600;
+}
+
+.member__ra {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ================= Animações ================= */
@@ -1195,6 +1646,13 @@
   }
 }
 
+@keyframes card-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 @keyframes brilho {
   to {
     background-position: -300% 0;
@@ -1202,14 +1660,6 @@
 }
 
 /* ================= Telas menores ================= */
-
-/* Em telas de toque não existe hover: as ações do card ficam sempre visíveis */
-@media (hover: none) {
-  .game-card__actions {
-    opacity: 1;
-    transform: none;
-  }
-}
 
 @media (max-width: 960px) {
   .auth {
@@ -1289,6 +1739,11 @@
   .game-form__preview-meta {
     grid-area: data;
   }
+
+  .about__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
 }
 
 @media (max-width: 640px) {
@@ -1302,28 +1757,81 @@
   }
 
   .header__nav {
-    display: none;
+    gap: var(--space-3);
   }
 
-  .header__user {
-    margin-left: auto;
+  .header__link {
+    font-size: 0.9rem;
   }
 
+  .header .brand__name,
+  .header .avatar,
   .header__name {
     display: none;
   }
 
-  .catalog__intro {
+  /* No celular, os filtros de status rolam para o lado em vez de ocupar várias linhas */
+  .status-filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--space-3));
+    padding: 0 var(--space-3) 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .search-field {
+    max-width: none;
+  }
+
+  .page-intro {
     align-items: stretch;
   }
 
-  .catalog__intro .button {
+  .page-intro .button {
     width: 100%;
   }
 
   .games-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4) var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .game-card__body {
+    padding: 0.75rem 0.75rem 0.6rem;
+  }
+
+  .game-card__title {
+    font-size: 0.98rem;
+  }
+
+  .card-action {
+    font-size: 0.8rem;
+  }
+
+  /* Status e nota dividem o topo da capa: no celular ficam um pouco menores */
+  .game-card__status,
+  .game-card__rating {
+    top: 0.5rem;
+  }
+
+  .game-card__status {
+    left: 0.5rem;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.68rem;
+  }
+
+  .game-card__rating {
+    right: 0.5rem;
+    padding: 0.1rem 0.45rem;
+    font-size: 1.05rem;
+  }
+
+  .game-card__rating--empty {
+    font-size: 0.68rem;
+  }
+
+  .dialog__actions {
+    flex-direction: column-reverse;
   }
 
   .empty-shelf {

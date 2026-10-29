@@ -87,10 +87,18 @@ export const api = {
   logout: () => request('/logout', { method: 'POST' }),
   currentUser: () => request('/user'),
 
-  listGames: (page = 1) => request(`/games?page=${page}`),
-  createGame: (dados) => request('/games', { method: 'POST', body: dados }),
-  updateGame: (id, dados) => request(`/games/${id}`, { method: 'PUT', body: dados }),
-  deleteGame: (id) => request(`/games/${id}`, { method: 'DELETE' }),
+  // Biblioteca pessoal: o id usado nas rotas é o da entrada (entry.id)
+  listLibrary: ({ search, status, page }) => {
+    const params = new URLSearchParams()
+    if (search) params.set('search', search)
+    if (status) params.set('status', status)
+    if (page > 1) params.set('page', page)
+    return request(`/library?${params}`)
+  },
+  getEntry: (id) => request(`/library/${id}`),
+  createEntry: (dados) => request('/library', { method: 'POST', body: dados }),
+  updateEntry: (id, dados) => request(`/library/${id}`, { method: 'PUT', body: dados }),
+  deleteEntry: (id) => request(`/library/${id}`, { method: 'DELETE' }),
 
   listGenres: () => request('/genres'),
   listPlatforms: () => request('/platforms'),

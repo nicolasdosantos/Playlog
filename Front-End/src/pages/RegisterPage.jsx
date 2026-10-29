@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import AuthField from '../components/AuthField'
 import Icon from '../components/Icon'
 import { api } from '../services/api'
 
-function RegisterPage({ onRegister, onGoToLogin }) {
+function RegisterPage({ onRegister }) {
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' })
   const [errors, setErrors] = useState({})
   const [message, setMessage] = useState(null)
@@ -31,7 +32,7 @@ function RegisterPage({ onRegister, onGoToLogin }) {
   }
 
   return (
-    <AuthLayout title="Criar conta" subtitle="Nome, e-mail e uma senha. Depois disso você já entra no catálogo.">
+    <AuthLayout title="Criar conta" subtitle="Nome, e-mail e uma senha. Depois disso você já entra na sua biblioteca.">
       {message && (
         <p className="alert alert--error" role="alert">
           {message}
@@ -97,9 +98,9 @@ function RegisterPage({ onRegister, onGoToLogin }) {
 
       <p className="auth__switch">
         Já tem conta?{' '}
-        <button type="button" className="link-button" onClick={onGoToLogin}>
+        <Link to="/entrar" className="link-button">
           Entrar
-        </button>
+        </Link>
       </p>
     </AuthLayout>
   )

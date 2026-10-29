@@ -25,10 +25,21 @@ npm run lint     # verifica o código com o ESLint
 
 ## Organização
 
+- `src/App.jsx`: rotas da aplicação (React Router) e controle da sessão
 - `src/services/api.js`: todas as chamadas à API (token Bearer, JSON e mensagens de erro)
-- `src/pages/`: telas (login, cadastro, catálogo e formulário de jogo)
-- `src/components/`: partes reutilizadas (cabeçalho, campo de formulário, card de jogo)
+- `src/pages/`: telas (entrar, cadastro, biblioteca, formulário de jogo, quem somos e página não encontrada)
+- `src/components/`: partes reutilizadas (cabeçalho, card de jogo, selo de status, diálogo de confirmação)
+- `src/library.js`: status da biblioteca e funções pequenas usadas por várias telas
 - `src/index.css`: cores, espaçamentos e transições da identidade visual
 - `src/App.css`: estilos das telas
+
+## Rotas
+
+| Endereço | Tela |
+|---|---|
+| `/entrar` e `/cadastro` | Login e criação de conta |
+| `/` | Biblioteca (busca e filtro por status ficam na URL: `?busca=…&status=…&pagina=…`) |
+| `/jogos/novo` e `/jogos/:id/editar` | Formulário do jogo |
+| `/quem-somos` | Integrantes e tecnologias do projeto |
 
 O token de acesso fica no `localStorage` do navegador e vale 24 horas. Quando ele expira, a aplicação volta para a tela de login.

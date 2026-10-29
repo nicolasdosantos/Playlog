@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// user_id fica fora do Fillable: o dono do registro é definido pelo relacionamento
-// ($user->userGames()->create(...)), nunca por dados enviados na requisição
-#[Fillable(['game_id', 'status', 'hours_played', 'rating', 'comment'])]
+// Entrada de um jogo na biblioteca de um usuário (status, horas e nota de 0 a 10).
+// user_id e game_id ficam fora do Fillable: são definidos pelos relacionamentos, não pela requisição.
+#[Fillable(['status', 'hours_played', 'rating', 'comment'])]
 #[Table('biblioteca_jogos')]
 class UserGame extends Model
 {

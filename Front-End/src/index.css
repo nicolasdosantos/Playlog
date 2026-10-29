@@ -27,6 +27,13 @@
   --color-success-soft: rgb(111 214 168 / 10%);
   --color-on-success: #0b2a1f;
 
+  /* Cores dos status da biblioteca */
+  --status-want: #9aa6b8;
+  --status-playing: var(--color-accent);
+  --status-paused: #6fb1e3;
+  --status-completed: var(--color-success);
+  --status-abandoned: var(--color-danger);
+
   /* Tons das capas geradas quando o jogo não tem imagem */
   --poster-1: #0f2240;
   --poster-2: #1b1b1d;
@@ -90,6 +97,11 @@ h3 {
   font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.05;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 img {

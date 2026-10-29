@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import Brand, { BrandMark } from './Brand'
 import Cover from './Cover'
 
@@ -14,7 +15,7 @@ function AuthLayout({ title, subtitle, children }) {
       <section className="auth__showcase">
         <Brand size="large" />
         <p className="auth__pitch">Sua estante de jogos, organizada.</p>
-        <p className="auth__pitch-sub">Capa, gênero e plataforma de cada título, num lugar só.</p>
+        <p className="auth__pitch-sub">Status, horas jogadas e a sua nota para cada jogo, num lugar só.</p>
 
         <div className="poster-wall" aria-hidden="true">
           {WALL.map((column, c) => (
@@ -40,6 +41,9 @@ function AuthLayout({ title, subtitle, children }) {
           <p className="auth__subtitle">{subtitle}</p>
           {children}
         </div>
+        <Link to="/quem-somos" className="auth__about">
+          Quem somos
+        </Link>
       </section>
     </main>
   )

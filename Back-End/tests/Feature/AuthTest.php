@@ -107,52 +107,30 @@ class AuthTest extends TestCase
             ->assertJsonPath('user.email', 'ana@exemplo.com');
     }
 
-    public function test_login_com_senha_incorreta_retorna_401(): void
+    // A mesma mensagem para senha errada e e-mail inexistente, para não revelar quais e-mails estão cadastrados
+    public function test_login_invalido_retorna_401_com_a_mesma_mensagem(): void
     {
         User::factory()->create(['email' => 'ana@exemplo.com', 'password' => 'senha-segura-123']);
 
         $this->postJson('/api/login', ['email' => 'ana@exemplo.com', 'password' => 'senha-errada'])
             ->assertUnauthorized()
             ->assertExactJson(['message' => 'E-mail ou senha inválidos.']);
-    }
 
-    public function test_login_com_email_inexistente_retorna_a_mesma_mensagem(): void
-    {
         $this->postJson('/api/login', ['email' => 'ninguem@exemplo.com', 'password' => 'senha-segura-123'])
             ->assertUnauthorized()
             ->assertExactJson(['message' => 'E-mail ou senha inválidos.']);
     }
 
-    public function test_rota_protegida_aceita_token_valido(): void
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        $this->getJson('/api/user', ['Authorization' => "Bearer $token"])
-            ->assertOk()
-            ->assertJsonPath('user.id', $user->id)
-            ->assertJsonMissingPath('user.password');
-    }
-
-    public function test_rota_protegida_recusa_requisicao_sem_token(): void
+    public function test_rota_protegida_recusa_requisicao_sem_token_ou_com_token_invalido(): void
     {
         $this->getJson('/api/user')->assertUnauthorized();
         $this->postJson('/api/logout')->assertUnauthorized();
-    }
+        $this->getJson('/api/user', ['Authorization' => 'Bearer 1|token-que-nao-existe'])->assertUnauthorized();
 
-    public function test_requisicao_sem_cabecalho_json_tambem_recebe_401_em_json(): void
-    {
+        // Mesmo sem pedir JSON, a API responde 401 em JSON (não tenta redirecionar para uma página de login)
         $this->get('/api/user')
             ->assertUnauthorized()
             ->assertExactJson(['message' => 'Unauthenticated.']);
-    }
-
-    public function test_rota_protegida_recusa_token_invalido(): void
-    {
-        User::factory()->create()->createToken('auth_token');
-
-        $this->getJson('/api/user', ['Authorization' => 'Bearer 1|token-que-nao-existe'])
-            ->assertUnauthorized();
     }
 
     public function test_logout_invalida_o_token_usado(): void

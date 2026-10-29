@@ -1,13 +1,14 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import AuthField from '../components/AuthField'
 import Icon from '../components/Icon'
 import { api } from '../services/api'
 
-function LoginPage({ onLogin, onGoToRegister, notice }) {
+function LoginPage({ notice, onLogin }) {
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
-  const [message, setMessage] = useState(notice)
+  const [message, setMessage] = useState(null)
   const [sending, setSending] = useState(false)
 
   function handleChange(event) {
@@ -30,11 +31,13 @@ function LoginPage({ onLogin, onGoToRegister, notice }) {
     }
   }
 
+  const visibleMessage = sending ? null : (message ?? notice)
+
   return (
     <AuthLayout title="Entrar" subtitle="Use o e-mail e a senha da sua conta.">
-      {message && (
-        <p className={`alert alert--${message.type}`} role={message.type === 'error' ? 'alert' : 'status'}>
-          {message.text}
+      {visibleMessage && (
+        <p className={`alert alert--${visibleMessage.type}`} role={visibleMessage.type === 'error' ? 'alert' : 'status'}>
+          {visibleMessage.text}
         </p>
       )}
 
@@ -72,9 +75,9 @@ function LoginPage({ onLogin, onGoToRegister, notice }) {
 
       <p className="auth__switch">
         Ainda não tem conta?{' '}
-        <button type="button" className="link-button" onClick={onGoToRegister}>
+        <Link to="/cadastro" className="link-button">
           Criar conta
-        </button>
+        </Link>
       </p>
     </AuthLayout>
   )
