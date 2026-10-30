@@ -40,7 +40,7 @@ function RegisterPage({ onRegister }) {
       )}
 
       <form className="form" onSubmit={handleSubmit} noValidate>
-        <AuthField icon="user" label="Nome" error={errors.name?.[0]}>
+        <AuthField label="Nome" error={errors.name?.[0]}>
           <input
             name="name"
             placeholder="Seu nome"
@@ -52,7 +52,7 @@ function RegisterPage({ onRegister }) {
           />
         </AuthField>
 
-        <AuthField icon="mail" label="E-mail" error={errors.email?.[0]}>
+        <AuthField label="E-mail" error={errors.email?.[0]}>
           <input
             type="email"
             name="email"
@@ -66,7 +66,7 @@ function RegisterPage({ onRegister }) {
         </AuthField>
 
         {/* A senha pode ter mais de um erro ao mesmo tempo (tamanho e confirmação); mostra todos */}
-        <AuthField icon="lock" label="Senha" hint="Pelo menos 8 caracteres." error={errors.password?.join(' ')}>
+        <AuthField label="Senha" hint="Pelo menos 8 caracteres." error={errors.password?.join(' ')}>
           <input
             type="password"
             name="password"
@@ -77,7 +77,7 @@ function RegisterPage({ onRegister }) {
           />
         </AuthField>
 
-        <AuthField icon="lock" label="Confirme a senha">
+        <AuthField label="Confirme a senha">
           <input
             type="password"
             name="password_confirmation"

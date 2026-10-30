@@ -1,28 +1,25 @@
 import { cloneElement, useId } from 'react'
-import Icon from './Icon'
 
-// Campo das telas de login e cadastro: ícone à esquerda e rótulo acima do texto, num bloco só
-function AuthField({ icon, label, error, hint, children }) {
+// Campo das telas de login e cadastro, adaptado do formulário "sharp-panda-27" do Uiverse (JkHuger, licença MIT):
+// borda em "L" e um rótulo que fica dentro do campo e sobe como uma etiqueta no foco ou quando há texto.
+function AuthField({ label, error, hint, children }) {
   const id = useId()
   const describedBy = error ? `${id}-erro` : hint ? `${id}-dica` : undefined
 
   return (
     <div className={`auth-field${error ? ' auth-field--error' : ''}`}>
-      <div className="auth-field__group">
-        <span className="auth-field__icon" aria-hidden="true">
-          <Icon name={icon} size={17} />
-        </span>
-        <div className="auth-field__content">
-          <label className="auth-field__label" htmlFor={id}>
-            {label}
-          </label>
-          {cloneElement(children, {
-            id,
-            className: 'auth-field__input',
-            'aria-invalid': error ? true : undefined,
-            'aria-describedby': describedBy,
-          })}
-        </div>
+      <div className="auth-field__box">
+        {cloneElement(children, {
+          id,
+          className: 'auth-field__input',
+          // O rótulo sobe quando o placeholder deixa de aparecer (campo com texto), por isso todo campo precisa de um
+          placeholder: children.props.placeholder ?? ' ',
+          'aria-invalid': error ? true : undefined,
+          'aria-describedby': describedBy,
+        })}
+        <label className="auth-field__label" htmlFor={id}>
+          {label}
+        </label>
       </div>
       {hint && !error && (
         <span id={`${id}-dica`} className="field__hint">

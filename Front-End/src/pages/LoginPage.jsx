@@ -42,7 +42,7 @@ function LoginPage({ notice, onLogin }) {
       )}
 
       <form className="form" onSubmit={handleSubmit} noValidate>
-        <AuthField icon="mail" label="E-mail" error={errors.email?.[0]}>
+        <AuthField label="E-mail" error={errors.email?.[0]}>
           <input
             type="email"
             name="email"
@@ -54,10 +54,11 @@ function LoginPage({ notice, onLogin }) {
           />
         </AuthField>
 
-        <AuthField icon="lock" label="Senha" error={errors.password?.[0]}>
+        <AuthField label="Senha" error={errors.password?.[0]}>
           <input
             type="password"
             name="password"
+            placeholder="sua senha"
             autoComplete="current-password"
             value={form.password}
             onChange={handleChange}

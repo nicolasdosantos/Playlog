@@ -1,50 +1,28 @@
 import { Link } from 'react-router-dom'
-import Brand, { BrandMark } from './Brand'
-import Cover from './Cover'
+import Brand from './Brand'
 
-// Palavras do mural decorativo: gêneros genéricos, nenhum jogo de verdade
-const WALL = [
-  ['RPG', 'Corrida', 'Puzzle', 'Terror'],
-  ['Plataforma', 'Luta', 'Aventura', 'Indie'],
-  ['Estratégia', 'Tiro', 'Simulação', 'Esportes'],
-]
-
+// Telas de login e cadastro: logo, uma frase curta e o formulário num card no centro da tela
 function AuthLayout({ title, subtitle, children }) {
   return (
     <main className="auth">
-      <section className="auth__showcase">
-        <Brand size="large" />
-        <p className="auth__pitch">Sua estante de jogos, organizada.</p>
-        <p className="auth__pitch-sub">Status, horas jogadas e a sua nota para cada jogo, num lugar só.</p>
-
-        <div className="poster-wall" aria-hidden="true">
-          {WALL.map((column, c) => (
-            <div key={c} className="poster-wall__column">
-              {column.map((word, r) => (
-                <div key={word} className="poster-wall__item" style={{ '--i': c * 2 + r }}>
-                  <Cover title={word} />
-                </div>
-              ))}
-            </div>
-          ))}
+      <div className="auth__panel">
+        <div className="auth__brand">
+          <Brand size="large" />
+          <p className="auth__tagline">Sua estante de jogos, organizada.</p>
         </div>
-      </section>
 
-      <section className="auth__form-side" aria-labelledby="auth-title">
-        <div className="auth__card">
-          <div className="auth__title-section">
-            <BrandMark className="auth__title-icon" />
-            <h1 id="auth-title" className="auth__title">
-              {title}
-            </h1>
-          </div>
+        <section className="auth__card" aria-labelledby="auth-title">
+          <h1 id="auth-title" className="auth__title">
+            {title}
+          </h1>
           <p className="auth__subtitle">{subtitle}</p>
           {children}
-        </div>
+        </section>
+
         <Link to="/quem-somos" className="auth__about">
           Quem somos
         </Link>
-      </section>
+      </div>
     </main>
   )
 }
