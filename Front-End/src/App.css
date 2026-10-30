@@ -101,7 +101,7 @@
   color: var(--color-text);
 }
 
-/* Barra dourada colada na borda inferior do cabeçalho marca a página atual */
+/* barrinha dourada embaixo do link da pagina atual */
 .header__link[aria-current='page']::after {
   content: '';
   position: absolute;
@@ -309,7 +309,7 @@
   border-color: var(--color-border-strong);
 }
 
-/* Foco: borda + anel dourado de 3px */
+/* foco: borda + anel dourado */
 .input:focus {
   outline: none;
   border-color: var(--color-accent);
@@ -340,7 +340,7 @@
   color-scheme: dark;
 }
 
-/* Gêneros e plataformas: checkboxes de verdade com visual de chip */
+/* generos e plataformas: checkbox com cara de chip */
 .options {
   margin: 0;
   padding: 0;
@@ -421,7 +421,7 @@
 /* ================= Avisos e estados ================= */
 
 .alert {
-  /* espaço para o cabeçalho fixo não cobrir o aviso quando a página rola até ele */
+  /* espaco pro header nao cobrir o aviso */
   scroll-margin-top: 6rem;
   margin-bottom: var(--space-4);
   padding: 0.8rem 1rem;
@@ -469,7 +469,7 @@
   border: none;
 }
 
-/* Aviso flutuante */
+/* toast */
 .toast {
   position: fixed;
   right: 1.5rem;
@@ -534,15 +534,16 @@
 
 /* ================= Capas ================= */
 
+/* 4:5 corta pouco tanto capa vertical quanto quadrada */
 .cover {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
   border-radius: var(--radius-md);
   background-color: var(--color-surface);
 }
 
-/* Capa tipográfica: o título vira a arte, condensado como a lombada de uma caixa */
+/* capa gerada quando o jogo nao tem imagem */
 .cover--poster {
   --tone: var(--poster-1);
   position: relative;
@@ -602,8 +603,7 @@
 
 /* ================= Login e cadastro ================= */
 
-/* Fundo com profundidade, sem ser uma cor sólida: brilho azul-marinho no alto, um toque de dourado
-   embaixo e uma trama de pontos bem sutil que some nas bordas */
+/* fundo do login */
 .auth {
   position: relative;
   min-height: 100vh;
@@ -648,8 +648,7 @@
   font-size: 0.95rem;
 }
 
-/* Card adaptado do formulário do Uiverse: relevo suave, com sombra escura embaixo à direita
-   e uma luz azulada em cima à esquerda */
+/* card do login (baseado no form do Uiverse) */
 .auth__card {
   width: 100%;
   padding: var(--space-5);
@@ -691,7 +690,7 @@
   color: var(--color-text);
 }
 
-/* Campo com borda em "L"; no foco, ou quando tem texto, a borda fecha e fica dourada */
+/* campo com borda em L, no foco ela fecha e fica dourada */
 .auth-field {
   display: grid;
   gap: 0.45rem;
@@ -719,7 +718,7 @@
     box-shadow var(--transition-base);
 }
 
-/* O placeholder só aparece com o campo em foco: antes disso, quem ocupa o lugar é o rótulo */
+/* placeholder so aparece no foco, antes fica o label */
 .auth-field__input::placeholder {
   color: var(--color-text-subtle);
   opacity: 0;
@@ -741,13 +740,13 @@
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
-/* Preenchimento automático do navegador sem o fundo amarelo/azul */
+/* tira o fundo do autocomplete */
 .auth-field__input:-webkit-autofill {
   -webkit-text-fill-color: var(--color-text);
   transition: background-color 9999s;
 }
 
-/* Rótulo dentro do campo; no foco ou com texto, sobe e vira uma etiqueta dourada sobre a borda */
+/* label sobe e vira etiqueta no foco ou quando tem texto */
 .auth-field__label {
   position: absolute;
   top: 50%;
@@ -800,7 +799,7 @@
   color: var(--color-on-danger);
 }
 
-/* Botão contornado em dourado que se preenche no hover, como no formulário de referência */
+/* botao contornado que preenche no hover */
 .auth__card .button--primary {
   min-height: 3rem;
   margin-top: 0.4rem;
@@ -819,7 +818,7 @@
   color: var(--color-on-accent);
 }
 
-/* A seta do botão avança no hover */
+/* seta anda no hover */
 .button__arrow {
   display: inline-flex;
   transition: transform var(--transition-base);
@@ -857,7 +856,7 @@
   margin-bottom: var(--space-5);
 }
 
-/* Título largo e pesado: o nome da tela é a peça tipográfica principal */
+/* titulo grande das paginas */
 .page-intro__title {
   font-size: clamp(3rem, 9vw, 6.25rem);
   font-weight: 800;
@@ -873,8 +872,9 @@
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
-  gap: var(--space-4);
+  /* minimo de 14rem por card, da 4 colunas no desktop */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-4) 1.25rem;
   transition: opacity var(--transition-base);
 }
 
@@ -882,7 +882,7 @@
   opacity: 0.5;
 }
 
-/* Card do jogo: capa em destaque, status e nota sobre a capa, ações no rodapé */
+/* card do jogo */
 .game-card {
   position: relative;
   display: flex;
@@ -891,7 +891,7 @@
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background-color: var(--color-bg-alt);
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg-alt) 100%);
   animation: card-entrada 320ms var(--ease-out) backwards;
   transition:
     transform var(--transition-base),
@@ -906,7 +906,13 @@
   box-shadow: var(--shadow-lift);
 }
 
-/* O foco do teclado no título contorna o card inteiro */
+/* afunda um pouco no clique */
+.game-card:has(.game-card__link:active) {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 80ms;
+}
+
+/* foco no titulo contorna o card todo */
 .game-card:has(.game-card__link:focus-visible) {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
@@ -919,102 +925,98 @@
 .game-card__media {
   position: relative;
   overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
 }
 
-/* A base da capa se funde com o fundo do card */
+/* sombra em cima pro status ficar legivel */
 .game-card__media::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, var(--color-bg-alt), transparent 20%);
+  background: linear-gradient(to bottom, rgb(0 0 0 / 45%), transparent 32%);
   pointer-events: none;
+}
+
+/* capa quadrada no card */
+.game-card__cover,
+.games-grid .skeleton--cover {
+  aspect-ratio: 1 / 1;
 }
 
 .game-card__cover {
   border-radius: 0;
-  transition: transform 500ms var(--ease-out);
+  transition:
+    transform 400ms var(--ease-out),
+    filter 400ms var(--ease-out);
 }
 
 .game-card:hover .game-card__cover {
-  transform: scale(1.04);
+  transform: scale(1.035);
+  filter: brightness(1.08);
 }
 
 .game-card__status {
   position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
+  top: 0.75rem;
+  left: 0.75rem;
   z-index: 1;
-}
-
-.game-card__rating {
-  position: absolute;
-  top: 0.65rem;
-  right: 0.65rem;
-  z-index: 1;
-  display: flex;
-  align-items: baseline;
-  gap: 0.1rem;
-  padding: 0.15rem 0.6rem;
-  border: 1px solid var(--color-accent-line);
-  border-radius: var(--radius-pill);
-  background-color: rgb(0 0 0 / 75%);
-  color: var(--color-accent-strong);
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 800;
-  line-height: 1.15;
-}
-
-.game-card__rating small {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.game-card__rating--empty {
-  padding: 0.25rem 0.65rem;
-  border-color: var(--color-border-strong);
-  color: var(--color-text-muted);
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 600;
 }
 
 .game-card__body {
   flex: 1;
   display: grid;
   align-content: start;
-  gap: 0.45rem;
-  padding: 0.9rem 0.95rem 0.75rem;
+  gap: 0.4rem;
+  padding: 0.85rem 0.95rem 0.8rem;
 }
 
-/* Títulos longos ficam em no máximo duas linhas */
+/* titulo em uma linha so */
 .game-card__title {
-  display: -webkit-box;
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
   font-size: 1.05rem;
   font-weight: 700;
   font-stretch: 100%;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
 }
 
-/* O link do título cobre o card todo, então clicar em qualquer parte abre a edição */
+.game-card:hover .game-card__title {
+  color: var(--color-accent-strong);
+}
+
+/* o link do titulo cobre o card inteiro */
 .game-card__link::after {
   content: '';
   position: absolute;
   inset: 0;
 }
 
-.game-card__meta {
+/* nota na esquerda, horas na direita */
+.game-card__info {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.3rem 0.85rem;
-  font-size: 0.84rem;
+  justify-content: space-between;
+  gap: 0.3rem 0.75rem;
+  min-height: 1.25rem;
+  font-size: 0.82rem;
   color: var(--color-text-muted);
+}
+
+.game-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.game-card__score {
+  font-weight: 600;
+}
+
+.game-card__no-rating {
+  color: var(--color-text-subtle);
 }
 
 .game-card__hours {
@@ -1023,15 +1025,16 @@
   gap: 0.3rem;
 }
 
-.game-card__platforms {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.8rem;
-  color: var(--color-text-subtle);
+@media (prefers-reduced-motion: reduce) {
+  .game-card:hover,
+  .game-card:focus-within,
+  .game-card:has(.game-card__link:active),
+  .game-card:hover .game-card__cover {
+    transform: none;
+  }
 }
 
-/* As ações ficam acima do link que cobre o card */
+/* acoes ficam por cima do link do card */
 .game-card__actions {
   position: relative;
   z-index: 2;
@@ -1045,11 +1048,11 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  min-height: 2.75rem;
+  min-height: 2.5rem;
   border: none;
   background: none;
   color: var(--color-text-muted);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -1092,12 +1095,13 @@
   color: var(--color-text-muted);
 }
 
-.tag--more {
+/* plataformas com contorno pra diferenciar dos generos */
+.tag--platform {
   background-color: transparent;
   border: 1px solid var(--color-border-strong);
 }
 
-/* Carregamento: capas vazias com brilho passando */
+/* skeleton do carregamento */
 .skeleton-card {
   display: grid;
   gap: 0.6rem;
@@ -1110,7 +1114,7 @@
 }
 
 .skeleton--cover {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 5;
 }
 
 .skeleton--line {
@@ -1123,7 +1127,7 @@
   width: 45%;
 }
 
-/* Biblioteca vazia: uma estante com espaços esperando jogos */
+/* biblioteca vazia */
 .empty-shelf {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -1312,7 +1316,7 @@
     color var(--transition-fast);
 }
 
-/* Bolinha com a cor do status ("Todos" não tem) */
+/* bolinha da cor do status */
 .status-filter__option[class*='--']::before {
   content: '';
   width: 0.5rem;
@@ -1460,7 +1464,7 @@
   margin-top: var(--space-3);
 }
 
-/* Status no formulário: opções de rádio com a cor de cada status */
+/* radio de status com a cor de cada um */
 .option--status {
   padding: 0.55rem 0.95rem;
   min-height: 2.75rem;
@@ -1564,6 +1568,243 @@ select.input {
   font-variant-numeric: tabular-nums;
 }
 
+/* ================= Estrelas ================= */
+
+/* estrela vazia embaixo e a dourada em cima, cortada pela largura */
+.stars {
+  display: inline-flex;
+  gap: 0.12rem;
+  line-height: 0;
+}
+
+.star {
+  position: relative;
+  display: inline-block;
+  color: rgb(255 255 255 / 16%);
+}
+
+.star svg {
+  display: block;
+  fill: currentColor;
+}
+
+.star__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  color: var(--color-accent);
+}
+
+/* ================= Página do jogo ================= */
+
+.details {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.details > .back-link {
+  justify-self: start;
+  margin-bottom: calc(-1 * var(--space-3));
+}
+
+/* topo da pagina do jogo */
+.details__hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(200px, 300px) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-lg) + 6px);
+  background:
+    radial-gradient(120% 90% at 0% 0%, var(--color-surface-raised), transparent 60%),
+    var(--color-bg-secondary);
+  animation: aparecer 260ms var(--ease-out);
+}
+
+.details__backdrop {
+  position: absolute;
+  inset: -40px;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  filter: blur(40px) saturate(1.4);
+  opacity: 0.75;
+}
+
+/* escurece o fundo pro texto ficar legivel */
+.details__hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 20%), rgb(0 0 0 / 62%)),
+    linear-gradient(to top, rgb(0 0 0 / 60%), transparent 65%);
+}
+
+.details__cover {
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 30px 60px -22px rgb(0 0 0 / 90%),
+    0 0 0 1px rgb(255 255 255 / 8%);
+}
+
+.details__main {
+  display: grid;
+  align-content: end;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.details__status {
+  justify-self: start;
+}
+
+.details__title {
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 800;
+  font-stretch: 120%;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.details__release {
+  color: var(--color-text-muted);
+}
+
+.details__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 0;
+}
+
+.details__stat {
+  min-width: 11rem;
+  padding: 0.85rem 1.15rem;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: var(--radius-md);
+  background-color: rgb(0 0 0 / 45%);
+  backdrop-filter: blur(8px);
+}
+
+.details__stat dt {
+  color: var(--color-text-subtle);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.details__stat dd {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  margin: 0.35rem 0 0;
+}
+
+.details__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.details__score,
+.details__hours {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.details__score {
+  color: var(--color-accent-strong);
+}
+
+.details__score small,
+.details__hours small {
+  margin-left: 0.15rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.details__hours {
+  gap: 0.45rem;
+}
+
+.details__hours svg {
+  color: var(--color-accent);
+}
+
+.details__empty {
+  color: var(--color-text-subtle);
+  font-size: 0.95rem;
+}
+
+.details__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.details__delete:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+/* descricao na esquerda, generos e plataformas na direita */
+.details__content {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.details__section {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-alt);
+}
+
+.details__heading {
+  color: var(--color-text-subtle);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.details__heading:not(:first-child) {
+  margin-top: var(--space-3);
+}
+
+/* pre-line mantem as quebras de linha da descricao */
+.details__description {
+  max-width: 68ch;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.details__tags .tag {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
 /* ================= Animações ================= */
 
 @keyframes aparecer {
@@ -1608,7 +1849,7 @@ select.input {
     gap: var(--space-4);
   }
 
-  /* No celular, a prévia vira uma linha compacta acima dos campos */
+  /* no celular a previa fica em cima dos campos */
   .game-form__preview {
     position: static;
     order: -1;
@@ -1642,6 +1883,16 @@ select.input {
     grid-template-columns: 1fr;
     gap: var(--space-5);
   }
+
+  .details__hero {
+    grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+    gap: var(--space-5);
+    padding: var(--space-5);
+  }
+
+  .details__content {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1668,7 +1919,7 @@ select.input {
     display: none;
   }
 
-  /* No celular, os filtros de status rolam para o lado em vez de ocupar várias linhas */
+  /* no celular os filtros rolam pro lado */
   .status-filter {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -1706,30 +1957,43 @@ select.input {
     font-size: 0.8rem;
   }
 
-  /* Status e nota dividem o topo da capa: no celular ficam um pouco menores */
-  .game-card__status,
-  .game-card__rating {
-    top: 0.5rem;
-  }
-
+  /* status menor no celular */
   .game-card__status {
+    top: 0.5rem;
     left: 0.5rem;
     padding: 0.15rem 0.5rem;
     font-size: 0.68rem;
   }
 
   .game-card__rating {
-    right: 0.5rem;
-    padding: 0.1rem 0.45rem;
-    font-size: 1.05rem;
-  }
-
-  .game-card__rating--empty {
-    font-size: 0.68rem;
+    gap: 0.35rem;
   }
 
   .dialog__actions {
     flex-direction: column-reverse;
+  }
+
+  /* pagina do jogo em uma coluna no celular */
+  .details__hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+
+  .details__cover {
+    width: min(220px, 65%);
+  }
+
+  .details__stat {
+    flex: 1 1 100%;
+  }
+
+  .details__actions .button {
+    flex: 1;
+  }
+
+  .details__section {
+    padding: var(--space-4);
   }
 
   .empty-shelf {

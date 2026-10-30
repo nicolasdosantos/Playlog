@@ -16,15 +16,16 @@ function countText(total, filtering) {
 function LibraryPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  // Busca, status e página ficam na URL: atualizar a página ou voltar no navegador mantém os filtros
+  // busca, status e pagina ficam na url
   const [params, setParams] = useSearchParams()
   const search = params.get('busca') ?? ''
-  const status = params.get('status') ?? ''
+  // status invalido na url vira "Todos"
+  const status = STATUSES.some((option) => option.value === params.get('status')) ? params.get('status') : ''
   const page = Number(params.get('pagina')) || 1
 
-  // O campo de busca tem um estado próprio: se ele lesse direto da URL, o cursor pularia para o fim ao digitar
+  // estado proprio pro campo de busca, senao o cursor pula pro fim
   const [searchText, setSearchText] = useState(search)
-  // Se a busca da URL mudar por fora (voltar/avançar do navegador ou "Limpar filtros"), o campo acompanha
+  // se a busca da url mudar (voltar/avancar, limpar filtros) atualiza o campo
   const [lastUrlSearch, setLastUrlSearch] = useState(search)
   if (search !== lastUrlSearch) {
     setLastUrlSearch(search)
@@ -35,31 +36,31 @@ function LibraryPage() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  // Aviso enviado pelo formulário ao salvar (ex.: "Jogo adicionado")
+  // aviso que vem do form
   const [toast, setToast] = useState(location.state?.notice ?? null)
   const [toDelete, setToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const closeToast = useCallback(() => setToast(null), [])
 
-  // Tira o aviso do histórico; sem isso, ele apareceria de novo ao atualizar a página
+  // tira o aviso do historico pra nao repetir no F5
   useEffect(() => {
     if (location.state?.notice) {
       navigate(location.pathname + location.search, { replace: true, state: null })
     }
   }, [location, navigate])
 
-  // A busca só vai para a URL (e para a API) quando a pessoa para de digitar
+  // debounce da busca (300ms)
   useEffect(() => {
     if (searchText === search) return
 
     const timer = setTimeout(() => {
-      // Parte da URL atual do navegador, para não desfazer um filtro clicado durante a espera
+      // pega a url atual pra nao perder filtro clicado no meio
       const next = new URLSearchParams(window.location.search)
       if (searchText) next.set('busca', searchText)
       else next.delete('busca')
       next.delete('pagina')
       setLoading(true)
-      // replace: cada busca não vira uma entrada nova no histórico do navegador
+      // replace pra nao encher o historico
       setParams(next, { replace: true })
     }, 300)
 
@@ -73,6 +74,16 @@ function LibraryPage() {
       .listLibrary({ search, status, page })
       .then((result) => {
         if (ignore) return
+
+        // pagina que nao existe (ex: ?pagina=99), vai pra ultima
+        if (result.meta.current_page > result.meta.last_page) {
+          const next = new URLSearchParams(window.location.search)
+          if (result.meta.last_page > 1) next.set('pagina', result.meta.last_page)
+          else next.delete('pagina')
+          setParams(next, { replace: true })
+          return
+        }
+
         setData(result)
         setLoadError('')
       })
@@ -83,11 +94,11 @@ function LibraryPage() {
         if (!ignore) setLoading(false)
       })
 
-    // Se os filtros mudarem antes da resposta, a resposta antiga é ignorada
+    // ignora resposta antiga se os filtros mudarem
     return () => {
       ignore = true
     }
-  }, [search, status, page, reloadKey])
+  }, [search, status, page, reloadKey, setParams])
 
   function reload() {
     setLoading(true)
@@ -96,14 +107,14 @@ function LibraryPage() {
   }
 
   function updateParams(changes) {
-    // Parte da URL atual do navegador, para não desfazer uma busca que acabou de ser aplicada
+    // pega a url atual pra nao perder a busca
     const current = new URLSearchParams(window.location.search)
     const next = new URLSearchParams(current)
     for (const [name, value] of Object.entries(changes)) {
       if (value) next.set(name, value)
       else next.delete(name)
     }
-    // Clicar no filtro que já está ativo não muda nada (nem dispara outra busca)
+    // filtro que ja ta ativo nao faz nada
     if (next.toString() === current.toString()) return
 
     setLoading(true)
@@ -122,7 +133,7 @@ function LibraryPage() {
       await api.deleteEntry(toDelete.id)
       setToast({ type: 'success', text: `"${toDelete.game.title}" foi removido da sua biblioteca.` })
 
-      // Se era o último jogo da página, volta para a anterior
+      // se era o ultimo da pagina volta uma
       if (games.length === 1 && page > 1) {
         goToPage(page - 1)
       } else {

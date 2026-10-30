@@ -65,8 +65,7 @@ function RegisterPage({ onRegister }) {
           />
         </AuthField>
 
-        {/* A senha pode ter mais de um erro ao mesmo tempo (tamanho e confirmação); mostra todos */}
-        <AuthField label="Senha" hint="Pelo menos 8 caracteres." error={errors.password?.join(' ')}>
+        <AuthField label="Senha" hint="Pelo menos 8 caracteres." error={errors.password?.[0]}>
           <input
             type="password"
             name="password"
@@ -77,7 +76,7 @@ function RegisterPage({ onRegister }) {
           />
         </AuthField>
 
-        <AuthField label="Confirme a senha">
+        <AuthField label="Confirme a senha" error={errors.password_confirmation?.[0]}>
           <input
             type="password"
             name="password_confirmation"

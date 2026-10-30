@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import Header from './components/Header'
 import AboutPage from './pages/AboutPage'
+import GameDetailsPage from './pages/GameDetailsPage'
 import GameFormPage from './pages/GameFormPage'
 import LibraryPage from './pages/LibraryPage'
 import LoginPage from './pages/LoginPage'
@@ -10,7 +11,7 @@ import RegisterPage from './pages/RegisterPage'
 import { api, clearToken, getToken, saveToken, setSessionExpiredHandler } from './services/api'
 import './App.css'
 
-// Cabeçalho e área de conteúdo das páginas internas
+// layout das paginas logadas
 function Layout({ user, onLogout, loggingOut }) {
   return (
     <>
@@ -26,20 +27,20 @@ function App() {
   const [user, setUser] = useState(null)
   const [checkingSession, setCheckingSession] = useState(() => Boolean(getToken()))
   const [loggingOut, setLoggingOut] = useState(false)
-  // Aviso mostrado na tela de login (sessão expirada, logout...)
+  // aviso da tela de login (sessao expirada, logout)
   const [loginNotice, setLoginNotice] = useState(null)
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
-    // Sem usuário, as páginas protegidas já redirecionam para /entrar
+    // sem usuario as paginas privadas ja mandam pro /entrar
     setSessionExpiredHandler(() => {
       setLoginNotice({ type: 'error', text: 'Sua sessão expirou. Entre novamente.' })
       setUser(null)
     })
   }, [])
 
-  // Se já existe um token salvo, confere com a API se ele ainda vale antes de mostrar a biblioteca
+  // se tem token salvo, confere na api se ainda vale
   useEffect(() => {
     if (!getToken()) return
 
@@ -63,7 +64,7 @@ function App() {
     try {
       await api.logout()
     } catch {
-      // Mesmo se a API falhar, o token é apagado do navegador e o usuário sai
+      // mesmo se a api falhar, sai igual
     }
     clearToken()
     setLoginNotice({ type: 'success', text: 'Você saiu da sua conta.' })
@@ -76,15 +77,14 @@ function App() {
     return <p className="state state--screen">Carregando…</p>
   }
 
-  // Páginas que exigem login: sem usuário, vai para a tela de entrar e depois volta para onde estava.
-  // Depois de sair ou de a sessão expirar (há um aviso de login), o próximo login começa pela biblioteca:
-  // quem entrar depois não deve cair na última página da pessoa que saiu.
+  // pagina privada: sem login vai pro /entrar e depois volta pra onde tava.
+  // se saiu ou a sessao expirou, o proximo login começa pela biblioteca
   function privatePage(page) {
     if (user) return page
     return <Navigate to="/entrar" replace state={loginNotice ? null : { from: location.pathname + location.search }} />
   }
 
-  // Depois de entrar, volta para a página que a pessoa tentou abrir (ou para a biblioteca)
+  // depois do login volta pra pagina que tentou abrir
   const afterLogin = location.state?.from ?? '/'
 
   return (
@@ -98,6 +98,7 @@ function App() {
       <Route element={<Layout user={user} onLogout={handleLogout} loggingOut={loggingOut} />}>
         <Route index element={privatePage(<LibraryPage />)} />
         <Route path="jogos/novo" element={privatePage(<GameFormPage />)} />
+        <Route path="jogos/:id" element={privatePage(<GameDetailsPage />)} />
         <Route path="jogos/:id/editar" element={privatePage(<GameFormPage />)} />
         <Route path="quem-somos" element={<AboutPage />} />
         <Route path="*" element={<NotFoundPage />} />

@@ -1,6 +1,6 @@
 import { statusLabel } from '../library'
 
-// Selo com a cor de cada status (as cores ficam no CSS, em .status--<valor>)
+// selo do status (a cor ta no css)
 function StatusBadge({ status, className = '' }) {
   return (
     <span className={`status status--${status} ${className}`}>

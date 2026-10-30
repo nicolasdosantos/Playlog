@@ -1,4 +1,4 @@
-// Comunicação com a API do Laravel. Todas as requisições passam por request().
+// chamadas pra api, tudo passa pelo request()
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api'
 const TOKEN_KEY = 'playlog_token'
 
@@ -22,7 +22,7 @@ export function clearToken() {
   localStorage.removeItem(TOKEN_KEY)
 }
 
-// O App registra aqui o que fazer quando o token deixa de valer (expirado ou inválido)
+// o App diz aqui o que fazer quando o token expira
 let onSessionExpired = () => {}
 
 export function setSessionExpiredHandler(handler) {
@@ -45,7 +45,7 @@ function errorMessage(status, data) {
   return data?.message ?? 'Não foi possível concluir a operação.'
 }
 
-// auth: false nas rotas públicas (login e cadastro), que não recebem o token
+// auth: false no login e no cadastro
 async function request(path, { method = 'GET', body, auth = true } = {}) {
   const headers = { Accept: 'application/json' }
   const token = auth ? getToken() : null
@@ -87,7 +87,7 @@ export const api = {
   logout: () => request('/logout', { method: 'POST' }),
   currentUser: () => request('/user'),
 
-  // Biblioteca pessoal: o id usado nas rotas é o da entrada (entry.id)
+  // o id aqui é o da entrada (entry.id)
   listLibrary: ({ search, status, page }) => {
     const params = new URLSearchParams()
     if (search) params.set('search', search)

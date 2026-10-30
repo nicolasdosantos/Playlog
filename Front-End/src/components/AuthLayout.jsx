@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Brand from './Brand'
 
-// Telas de login e cadastro: logo, uma frase curta e o formulário num card no centro da tela
+// layout do login e do cadastro
 function AuthLayout({ title, subtitle, children }) {
   return (
     <main className="auth">

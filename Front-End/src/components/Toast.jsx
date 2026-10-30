@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import Icon from './Icon'
 
-// Aviso flutuante no canto da tela: fica visível mesmo se a pessoa estiver no fim da lista
+// aviso no canto da tela
 function Toast({ toast, onClose }) {
   useEffect(() => {
     if (!toast) return
-    // Erros ficam mais tempo na tela para dar tempo de ler o motivo
+    // erro fica mais tempo
     const timer = setTimeout(onClose, toast.type === 'error' ? 9000 : 5000)
     return () => clearTimeout(timer)
   }, [toast, onClose])

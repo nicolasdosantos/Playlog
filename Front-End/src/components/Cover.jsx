@@ -1,13 +1,13 @@
 import { useState } from 'react'
 
-// Escolhe sempre o mesmo tom para o mesmo título, para a capa gerada não mudar a cada visita
+// mesmo titulo sempre gera a mesma cor
 function posterTone(title) {
   let sum = 0
   for (const char of title) sum += char.codePointAt(0)
   return (sum % 5) + 1
 }
 
-// Capa do jogo. Sem imagem (ou com imagem quebrada), mostra uma capa tipográfica com o título.
+// sem imagem (ou imagem quebrada) mostra a capa com o titulo
 function Cover({ title, url, className = '' }) {
   const [failedUrl, setFailedUrl] = useState(null)
   const name = title.trim() || 'Sem título'

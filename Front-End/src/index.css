@@ -1,4 +1,4 @@
-/* Identidade visual do Playlog: preto de verdade, marinho nas superfícies e amarelo-dourado como destaque */
+/* cores, espacamentos e fontes do projeto */
 :root {
   --color-bg: #000000;
   --color-bg-alt: #080808;
@@ -11,7 +11,7 @@
   --color-text-muted: #a1a8b3;
   --color-text-subtle: #7b828d;
 
-  /* Dourado: só em ações principais, estados ativos, foco, seleção e detalhes da marca */
+  /* dourado so pra destaque */
   --color-accent: #e0b52f;
   --color-accent-strong: #f2cb55;
   --color-on-accent: #141000;
@@ -27,14 +27,14 @@
   --color-success-soft: rgb(111 214 168 / 10%);
   --color-on-success: #0b2a1f;
 
-  /* Cores dos status da biblioteca */
+  /* cores dos status */
   --status-want: #9aa6b8;
   --status-playing: var(--color-accent);
   --status-paused: #6fb1e3;
   --status-completed: var(--color-success);
   --status-abandoned: var(--color-danger);
 
-  /* Tons das capas geradas quando o jogo não tem imagem */
+  /* cores das capas geradas */
   --poster-1: #0f2240;
   --poster-2: #1b1b1d;
   --poster-3: #0b2a31;
