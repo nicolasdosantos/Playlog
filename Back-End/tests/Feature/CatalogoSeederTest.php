@@ -35,10 +35,20 @@ class CatalogoSeederTest extends TestCase
         $this->seed(CatalogoSeeder::class);
         $this->seed(CatalogoSeeder::class);
 
-        // 13 do seeder + Metroidvania; o RPG que já existia é reaproveitado, com o mesmo id
+        // 13 do seeder + Metroidvania, e o RPG continua com o mesmo id
         $this->assertDatabaseCount('generos', 14);
         $this->assertDatabaseCount('plataformas', 8);
         $this->assertSame([$rpg->id], Genre::where('name', 'RPG')->pluck('id')->all());
         $this->assertDatabaseHas('generos', ['id' => $metroidvania->id, 'name' => 'Metroidvania']);
+    }
+
+    // migrate --seed roda o DatabaseSeeder
+    public function test_seeder_principal_cadastra_o_catalogo_sem_criar_usuarios(): void
+    {
+        $this->seed();
+
+        $this->assertDatabaseCount('generos', 13);
+        $this->assertDatabaseCount('plataformas', 8);
+        $this->assertDatabaseCount('usuarios', 0);
     }
 }

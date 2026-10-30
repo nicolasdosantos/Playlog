@@ -7,8 +7,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-// Dados do jogo e dados pessoais da entrada (status, horas e nota).
-// user_id e game_id não estão nas regras, então não podem ser enviados pelo cliente.
+// dados do jogo + status, horas e nota
+// user_id e game_id nao estao nas regras, entao nao da pra mandar pela requisicao
 class LibraryEntryRequest extends FormRequest
 {
     private const GAME_FIELDS = ['title', 'description', 'release_date', 'cover_url'];
@@ -20,7 +20,7 @@ class LibraryEntryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // O token é exigido nas rotas e o controller só busca entradas do próprio usuário
+        // as rotas ja pedem token e o controller filtra pelo usuario
         return true;
     }
 
@@ -31,7 +31,7 @@ class LibraryEntryRequest extends FormRequest
      */
     public function rules(): array
     {
-        // No PATCH (atualização parcial) o título pode ser omitido, mas nunca enviado vazio
+        // no PATCH o titulo pode faltar, mas nao pode vir vazio
         $title = $this->isMethod('PATCH')
             ? ['sometimes', 'required', 'string', 'max:255']
             : ['required', 'string', 'max:255'];
@@ -45,10 +45,10 @@ class LibraryEntryRequest extends FormRequest
             'genres.*' => ['integer', 'distinct', 'exists:generos,id'],
             'platforms' => ['sometimes', 'array'],
             'platforms.*' => ['integer', 'distinct', 'exists:plataformas,id'],
-            // Opcionais: no cadastro valem os padrões (Quero jogar, 0 h, sem nota); na edição, mantêm o valor atual
+            // opcionais: no cadastro usa o padrao, na edicao mantem o que ja tinha
             'status' => ['sometimes', 'required', Rule::in(UserGame::STATUSES)],
             'hours_played' => ['sometimes', 'required', 'numeric', 'decimal:0,1', 'min:0', 'max:99999.9'],
-            // numeric recusa true/false, que o integer sozinho aceitaria como 1 e 0
+            // numeric pra nao aceitar true/false
             'rating' => ['sometimes', 'nullable', 'numeric', 'integer', 'between:0,10'],
         ];
     }
@@ -95,13 +95,13 @@ class LibraryEntryRequest extends FormRequest
         ];
     }
 
-    // Campos da tabela jogos que vieram na requisição
+    // campos da tabela jogos
     public function gameData(): array
     {
         return $this->safe()->only(self::GAME_FIELDS);
     }
 
-    // Campos da tabela biblioteca_jogos que vieram na requisição
+    // campos da tabela biblioteca_jogos
     public function entryData(): array
     {
         return $this->safe()->only(self::ENTRY_FIELDS);

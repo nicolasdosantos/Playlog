@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-// Dados do jogo, sempre dentro de uma entrada da biblioteca (LibraryEntryResource)
+// dados do jogo, usado dentro do LibraryEntryResource
 class GameResource extends JsonResource
 {
     /**

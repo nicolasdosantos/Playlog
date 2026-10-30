@@ -82,9 +82,20 @@ class AuthTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['password' => 'A senha deve ter pelo menos 8 caracteres.']);
 
+        $this->assertDatabaseCount('usuarios', 0);
+    }
+
+    // o erro tem que vir no campo de confirmacao, nao no da senha
+    public function test_confirmacao_de_senha_diferente_e_recusada_no_campo_de_confirmacao(): void
+    {
         $this->postJson('/api/register', $this->dadosDeCadastro(['password_confirmation' => 'outra-senha-123']))
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['password' => 'A confirmação da senha não confere.']);
+            ->assertJsonValidationErrors(['password_confirmation' => 'A confirmação da senha não confere.'])
+            ->assertJsonMissingValidationErrors('password');
+
+        $this->postJson('/api/register', $this->dadosDeCadastro(['password_confirmation' => null]))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['password_confirmation' => 'O campo confirmação da senha é obrigatório.']);
 
         $this->assertDatabaseCount('usuarios', 0);
     }
@@ -107,7 +118,7 @@ class AuthTest extends TestCase
             ->assertJsonPath('user.email', 'ana@exemplo.com');
     }
 
-    // A mesma mensagem para senha errada e e-mail inexistente, para não revelar quais e-mails estão cadastrados
+    // mesma msg pra senha errada e email que nao existe
     public function test_login_invalido_retorna_401_com_a_mesma_mensagem(): void
     {
         User::factory()->create(['email' => 'ana@exemplo.com', 'password' => 'senha-segura-123']);
@@ -127,7 +138,7 @@ class AuthTest extends TestCase
         $this->postJson('/api/logout')->assertUnauthorized();
         $this->getJson('/api/user', ['Authorization' => 'Bearer 1|token-que-nao-existe'])->assertUnauthorized();
 
-        // Mesmo sem pedir JSON, a API responde 401 em JSON (não tenta redirecionar para uma página de login)
+        // sem pedir json tambem tem que voltar 401 em json
         $this->get('/api/user')
             ->assertUnauthorized()
             ->assertExactJson(['message' => 'Unauthenticated.']);
@@ -144,7 +155,7 @@ class AuthTest extends TestCase
 
         $this->assertDatabaseCount('personal_access_tokens', 0);
 
-        // O guard guarda o usuário autenticado entre requisições do mesmo teste; limpa para validar o token de novo
+        // limpa o usuario guardado no guard pra testar o token de novo
         $this->app['auth']->forgetGuards();
 
         $this->getJson('/api/user', ['Authorization' => "Bearer $token"])
@@ -194,7 +205,7 @@ class AuthTest extends TestCase
             ->assertTooManyRequests()
             ->assertHeader('Retry-After');
 
-        // Depois do limite, nem a senha certa é aceita até o bloqueio acabar
+        // bloqueado: nem a senha certa passa
         $this->postJson('/api/login', $senhaCerta)->assertTooManyRequests();
 
         $this->travel(61)->seconds();

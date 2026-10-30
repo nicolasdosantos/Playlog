@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // A API não tem página de login: sem redirecionamento, quem não tem token recebe 401 em JSON
+        // a api nao tem tela de login, entao sem token volta 401 em json
         $middleware->redirectGuestsTo(
             fn (Request $request) => $request->is('api/*') ? null : route('login'),
         );
@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        // A mensagem padrão do Laravel mostra o nome interno do Model (ex.: App\Models\Game)
+        // a msg padrao mostrava o nome do model (App\Models\Game)
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json(['message' => 'Registro não encontrado.'], 404);

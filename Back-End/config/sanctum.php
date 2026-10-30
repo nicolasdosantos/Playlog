@@ -50,7 +50,7 @@ return [
     |
     */
 
-    // Tokens do Playlog valem 24 horas (em minutos)
+    // token vale 24h (em minutos)
     'expiration' => 60 * 24,
 
     /*

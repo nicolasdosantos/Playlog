@@ -40,7 +40,7 @@ class User extends Authenticatable
         return $this->hasOne(Profile::class);
     }
 
-    // Biblioteca pessoal do usuário
+    // biblioteca do usuario
     public function userGames(): HasMany
     {
         return $this->hasMany(UserGame::class);

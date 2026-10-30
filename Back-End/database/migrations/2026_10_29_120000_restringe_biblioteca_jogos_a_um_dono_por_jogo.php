@@ -12,12 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Cada jogo passa a pertencer a uma única entrada da biblioteca (e, portanto, a um único usuário)
+        // agora cada jogo tem um dono so
         Schema::table('biblioteca_jogos', function (Blueprint $table) {
             $table->unique('game_id');
         });
 
-        // A nota pessoal passa da escala de 1 a 5 para 0 a 10
+        // nota muda de 1-5 pra 0-10
         DB::statement('ALTER TABLE biblioteca_jogos DROP CONSTRAINT biblioteca_jogos_rating_check');
         DB::statement('ALTER TABLE biblioteca_jogos ADD CONSTRAINT biblioteca_jogos_rating_check CHECK (rating IS NULL OR rating BETWEEN 0 AND 10)');
     }

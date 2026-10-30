@@ -10,25 +10,26 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
-// Biblioteca pessoal: todas as consultas partem das entradas do usuário logado,
-// então a entrada de outra pessoa nunca é encontrada (responde 404)
+// tudo parte do userGames() do usuario logado,
+// entao jogo de outra pessoa sempre da 404
 class LibraryController extends Controller
 {
     private const RELATIONS = ['game.genres', 'game.platforms'];
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        // Sem isso, um filtro enviado como lista (ex.: ?search[]=x) causaria um erro 500
+        // valida os filtros da url (?search[]=x dava erro 500)
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
-            'status' => ['nullable', 'string'],
+            'status' => ['nullable', Rule::in(UserGame::STATUSES)],
             'genre' => ['nullable', 'integer'],
             'platform' => ['nullable', 'integer'],
         ], [
             'search.string' => 'A busca deve ser um texto.',
             'search.max' => 'A busca deve ter no máximo 255 caracteres.',
-            'status.string' => 'O status do filtro é inválido.',
+            'status.in' => 'O status do filtro é inválido.',
             'genre.integer' => 'O gênero do filtro é inválido.',
             'platform.integer' => 'A plataforma do filtro é inválida.',
         ]);
@@ -60,7 +61,7 @@ class LibraryController extends Controller
 
     public function store(LibraryEntryRequest $request): JsonResponse
     {
-        // O jogo, os gêneros, as plataformas e a entrada são salvos juntos: se algo falhar, nada fica gravado
+        // salva tudo junto, se der erro nada fica gravado
         $entry = DB::transaction(function () use ($request) {
             $game = Game::create($request->gameData());
             $this->syncRelations($game, $request);
@@ -104,8 +105,8 @@ class LibraryController extends Controller
     {
         $entry = $this->findEntry($request, $entry);
 
-        // A entrada é apagada antes do jogo, porque o banco não deixa excluir um jogo que está na biblioteca.
-        // Os vínculos do jogo com gêneros e plataformas são apagados em cascata pelo banco.
+        // apaga a entrada antes do jogo por causa da FK (restrict)
+        // generos e plataformas do jogo saem em cascata
         DB::transaction(function () use ($entry) {
             $game = $entry->game;
             $entry->delete();
@@ -120,7 +121,7 @@ class LibraryController extends Controller
         return $request->user()->userGames()->with(self::RELATIONS)->findOrFail($id);
     }
 
-    // Quantos jogos o usuário tem em cada status, para os filtros da tela
+    // contagem por status pros filtros
     private function statusCounts(Request $request): array
     {
         $counts = $request->user()->userGames()
@@ -136,7 +137,7 @@ class LibraryController extends Controller
         return $result;
     }
 
-    // Só altera as associações que vieram na requisição; se a lista não for enviada, mantém as atuais
+    // so mexe nos generos/plataformas se vierem na requisicao
     private function syncRelations(Game $game, LibraryEntryRequest $request): void
     {
         if ($request->has('genres')) {

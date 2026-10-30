@@ -19,7 +19,7 @@ class GenrePlatformTest extends TestCase
         $this->getJson('/api/platforms')->assertUnauthorized();
     }
 
-    // Nomes sem acento: o SQLite dos testes ordena acentos de um jeito diferente do MariaDB
+    // sem acento pq o SQLite ordena acento diferente do MySQL
     public function test_generos_e_plataformas_sao_listados_em_ordem_alfabetica(): void
     {
         Sanctum::actingAs(User::factory()->create());

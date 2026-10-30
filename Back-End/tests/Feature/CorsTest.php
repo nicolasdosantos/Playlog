@@ -35,7 +35,7 @@ class CorsTest extends TestCase
             ->assertHeaderMissing('Access-Control-Allow-Origin');
     }
 
-    // Sem o cabeçalho de CORS no 401, o navegador esconde a resposta e o front não consegue avisar que a sessão expirou
+    // sem CORS no 401 o front nao consegue ver que a sessao expirou
     public function test_resposta_401_tambem_tem_o_cabecalho_de_cors(): void
     {
         $this->getJson('/api/library', ['Origin' => 'http://localhost:5173'])

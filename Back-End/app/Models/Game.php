@@ -29,7 +29,7 @@ class Game extends Model
         return $this->belongsToMany(Platform::class, 'jogo_plataforma');
     }
 
-    // Cada jogo pertence a uma única entrada da biblioteca, que indica quem é o dono
+    // cada jogo tem uma entrada so (o dono)
     public function libraryEntry(): HasOne
     {
         return $this->hasOne(UserGame::class);
