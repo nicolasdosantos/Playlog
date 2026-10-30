@@ -861,6 +861,8 @@
 
 .auth-field__group {
   position: relative;
+  /* Recorta a faixa dourada da esquerda no mesmo arredondamento do campo */
+  overflow: hidden;
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -881,7 +883,6 @@
   left: 0;
   width: 3px;
   height: 0;
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
   background: linear-gradient(180deg, var(--color-accent-strong), var(--color-accent));
   transition: height var(--transition-base);
 }
