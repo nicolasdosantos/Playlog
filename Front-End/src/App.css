@@ -602,31 +602,41 @@
 
 /* ================= Login e cadastro ================= */
 
+/* Mesmo contêiner centralizado das outras telas: logo no topo e, abaixo, o título e o formulário
+   lado a lado, centralizados na altura da tela e alinhados pelo centro um do outro */
 .auth {
+  position: relative;
   min-height: 100vh;
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-6);
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(400px, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  grid-template-rows: auto 1fr;
+  column-gap: clamp(2.5rem, 7vw, 7rem);
 }
 
-/* O mural é cortado na altura da tela para não empurrar o formulário para baixo */
+/* O logo, o texto e o formulário ficam por cima do cenário */
+.auth__top,
+.auth__showcase,
+.auth__form-side {
+  position: relative;
+  z-index: 1;
+}
+
+.auth__top {
+  grid-column: 1 / -1;
+}
+
 .auth__showcase {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
+  align-self: center;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-6);
-  background:
-    radial-gradient(90% 60% at 85% 100%, var(--color-bg-secondary), transparent 70%),
-    var(--color-bg);
-  border-right: 1px solid var(--color-border);
 }
 
 .auth__pitch {
   max-width: 14ch;
-  margin-top: var(--space-5);
   font-family: var(--font-display);
   font-size: clamp(2.4rem, 4.2vw, 3.6rem);
   font-weight: 800;
@@ -641,45 +651,137 @@
   font-size: 1.05rem;
 }
 
-/* Mural de capas inclinado, abaixo do texto (no fluxo, para nunca cobrir a marca e o título).
-   A entrada das capas é a única animação automática da aplicação. */
-.poster-wall {
-  flex-shrink: 0;
-  display: flex;
-  gap: 1rem;
-  width: 88%;
-  margin: var(--space-5) 0 0 22%;
-  transform: rotate(-8deg);
-  transform-origin: top left;
-  mask-image: linear-gradient(to bottom, black 55%, transparent 95%);
+/* Cenário de "tela de título" atrás do login. Abre com o sol nascendo e o céu clareando;
+   depois só fica o movimento de ambiente: montanhas deslizando, estrelas piscando e uma estrela cadente. */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
   pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 38% at 48% 76%, rgb(224 181 47 / 20%), transparent 70%),
+    linear-gradient(to bottom, #000 0%, #02060d 38%, #07111f 64%, #0f2240 88%);
 }
 
-.poster-wall__column {
-  flex: 1;
-  display: grid;
-  gap: 1rem;
+/* O céu começa escuro e clareia enquanto o sol nasce */
+.scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  opacity: 0;
+  animation: amanhecer 2.6s var(--ease-out) backwards;
 }
 
-.poster-wall__column:nth-child(2) {
-  transform: translateY(-14%);
+.scene__star {
+  position: absolute;
+  border-radius: 50%;
+  background-color: #fff;
+  opacity: 0.8;
+  animation: cintilar 4s ease-in-out infinite;
 }
 
-.poster-wall__column:nth-child(3) {
-  transform: translateY(-4%);
+.scene__shooting-star {
+  position: absolute;
+  top: 12%;
+  left: 64%;
+  width: 140px;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgb(255 255 255 / 90%), transparent);
+  rotate: -18deg;
+  opacity: 0;
+  animation: estrela-cadente 9s ease-in 3s infinite;
 }
 
-.poster-wall__item {
-  animation: subir-capa 700ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * 70ms);
+.scene__sun {
+  position: absolute;
+  /* Entre o título e o formulário */
+  left: 46%;
+  bottom: 27vh;
+  width: min(26vmin, 240px);
+  aspect-ratio: 1;
+  translate: -50% 50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-accent-strong) 0 55%, var(--color-accent) 72%);
+  box-shadow:
+    0 0 60px 20px rgb(224 181 47 / 28%),
+    0 0 180px 80px rgb(224 181 47 / 10%);
+  animation:
+    nascer-do-sol 2.8s var(--ease-out) backwards,
+    brilho-do-sol 6s ease-in-out 2.8s infinite;
+}
+
+/* Cada camada tem duas cópias do desenho e desliza metade da largura, numa velocidade própria */
+.scene__layer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  width: 200%;
+  animation: deslizar linear infinite;
+}
+
+.scene__layer svg {
+  display: block;
+  width: 50%;
+  height: 100%;
+}
+
+.scene__ridge {
+  fill: none;
+  stroke: none;
+}
+
+/* Quanto mais longe, mais clara a montanha e mais devagar ela anda */
+.scene__layer--far {
+  height: 46vh;
+  animation-duration: 200s;
+}
+
+.scene__layer--far .scene__ground {
+  fill: #102446;
+}
+
+/* Luz do sol contornando os picos mais distantes */
+.scene__layer--far .scene__ridge {
+  stroke: rgb(224 181 47 / 40%);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.scene__layer--mid {
+  height: 38vh;
+  animation-duration: 140s;
+}
+
+.scene__layer--mid .scene__ground {
+  fill: #0b1830;
+}
+
+.scene__layer--near {
+  height: 30vh;
+  animation-duration: 90s;
+}
+
+.scene__layer--near .scene__ground {
+  fill: #060e1c;
+}
+
+.scene__layer--front {
+  height: 20vh;
+  animation-duration: 60s;
+}
+
+.scene__layer--front .scene__ground {
+  fill: #000;
 }
 
 .auth__form-side {
+  align-self: center;
   display: grid;
-  place-items: center;
-  align-content: center;
+  justify-items: center;
   gap: var(--space-4);
-  padding: var(--space-6) var(--space-5);
 }
 
 /* Card de login e cadastro, adaptado do formulário de referência (Uiverse, licença MIT) */
@@ -690,7 +792,9 @@
   padding: var(--space-5) var(--space-5) var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: linear-gradient(150deg, var(--color-surface) 0%, var(--color-bg-secondary) 100%);
+  /* Fundo um pouco transparente e desfocado: o cenário aparece de leve por trás do formulário */
+  background: linear-gradient(150deg, rgb(11 22 38 / 84%) 0%, rgb(7 17 31 / 90%) 100%);
+  backdrop-filter: blur(12px);
   box-shadow: 0 30px 80px -24px rgb(0 0 0 / 90%);
 }
 
@@ -1639,10 +1743,54 @@ select.input {
   }
 }
 
-@keyframes subir-capa {
+@keyframes amanhecer {
   from {
+    opacity: 0.8;
+  }
+}
+
+@keyframes nascer-do-sol {
+  from {
+    opacity: 0.4;
+    transform: translateY(45%);
+  }
+}
+
+@keyframes brilho-do-sol {
+  50% {
+    box-shadow:
+      0 0 80px 28px rgb(224 181 47 / 34%),
+      0 0 220px 100px rgb(224 181 47 / 13%);
+  }
+}
+
+@keyframes deslizar {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes cintilar {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* A estrela cadente aparece rapidamente no começo do ciclo e fica escondida no resto do tempo */
+@keyframes estrela-cadente {
+  0% {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateX(0);
+  }
+
+  3% {
+    opacity: 1;
+  }
+
+  9%,
+  100% {
+    opacity: 0;
+    transform: translateX(-320px);
   }
 }
 
@@ -1664,19 +1812,23 @@ select.input {
 @media (max-width: 960px) {
   .auth {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
+
+  /* Uma coluna só: logo, título e formulário dividem a mesma largura, com as bordas alinhadas */
+  .auth__top,
+  .auth__showcase,
+  .auth__form-side {
+    width: min(420px, 100%);
+    justify-self: center;
   }
 
   .auth__showcase {
-    position: relative;
-    height: auto;
-    padding: var(--space-5) var(--space-4) 0;
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
-    min-height: 15rem;
+    padding-top: var(--space-4);
   }
 
   .auth__pitch {
-    margin-top: var(--space-2);
     font-size: clamp(2rem, 7vw, 2.6rem);
   }
 
@@ -1684,25 +1836,18 @@ select.input {
     display: none;
   }
 
-  .poster-wall {
-    width: 115%;
-    margin: var(--space-2) 0 -4rem -6%;
-    transform: rotate(-5deg);
-    transform-origin: center;
-    mask-image: none;
-  }
-
-  .poster-wall__column {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .poster-wall__column:nth-child(n + 2) {
-    display: none;
+  /* Em telas menores o formulário fica no meio da tela: o sol sobe para o canto do céu, na altura do logo */
+  .scene__sun {
+    top: 20px;
+    right: 24px;
+    bottom: auto;
+    left: auto;
+    width: 64px;
+    translate: none;
   }
 
   .auth__form-side {
-    padding: var(--space-5) var(--space-4) var(--space-6);
-    place-items: start center;
+    padding-top: var(--space-5);
   }
 
   .game-form {

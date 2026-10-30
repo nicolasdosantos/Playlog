@@ -1,33 +1,20 @@
 import { Link } from 'react-router-dom'
 import Brand, { BrandMark } from './Brand'
-import Cover from './Cover'
-
-// Palavras do mural decorativo: gêneros genéricos, nenhum jogo de verdade
-const WALL = [
-  ['RPG', 'Corrida', 'Puzzle', 'Terror'],
-  ['Plataforma', 'Luta', 'Aventura', 'Indie'],
-  ['Estratégia', 'Tiro', 'Simulação', 'Esportes'],
-]
+import TitleScene from './TitleScene'
 
 function AuthLayout({ title, subtitle, children }) {
   return (
     <main className="auth">
-      <section className="auth__showcase">
+      <TitleScene />
+
+      {/* O logo fica no topo, na mesma margem do cabeçalho das outras telas */}
+      <div className="auth__top">
         <Brand size="large" />
+      </div>
+
+      <section className="auth__showcase">
         <p className="auth__pitch">Sua estante de jogos, organizada.</p>
         <p className="auth__pitch-sub">Status, horas jogadas e a sua nota para cada jogo, num lugar só.</p>
-
-        <div className="poster-wall" aria-hidden="true">
-          {WALL.map((column, c) => (
-            <div key={c} className="poster-wall__column">
-              {column.map((word, r) => (
-                <div key={word} className="poster-wall__item" style={{ '--i': c * 2 + r }}>
-                  <Cover title={word} />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
       </section>
 
       <section className="auth__form-side" aria-labelledby="auth-title">
