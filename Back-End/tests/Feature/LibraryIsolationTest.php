@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-// Cada usuário só pode ver e alterar a própria biblioteca
+// cada usuario so ve e mexe na propria biblioteca
 class LibraryIsolationTest extends TestCase
 {
     use RefreshDatabase;

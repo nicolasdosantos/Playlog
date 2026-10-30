@@ -32,7 +32,7 @@ function AboutPage() {
               <span>API e autenticação por token (back-end)</span>
             </li>
             <li>
-              <strong>MariaDB</strong>
+              <strong>MySQL</strong>
               <span>Banco de dados</span>
             </li>
           </ul>

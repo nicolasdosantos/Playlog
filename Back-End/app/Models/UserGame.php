@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// Entrada de um jogo na biblioteca de um usuário (status, horas e nota de 0 a 10).
-// user_id e game_id ficam fora do Fillable: são definidos pelos relacionamentos, não pela requisição.
-#[Fillable(['status', 'hours_played', 'rating', 'comment'])]
+// jogo na biblioteca de um usuario (status, horas e nota)
+// user_id e game_id fora do fillable de proposito
+#[Fillable(['status', 'hours_played', 'rating'])]
 #[Table('biblioteca_jogos')]
 class UserGame extends Model
 {
     public const STATUSES = ['want_to_play', 'playing', 'paused', 'completed', 'abandoned'];
 
-    // Mesmos valores padrão definidos na migration
+    // mesmo padrao da migration
     protected $attributes = [
         'status' => 'want_to_play',
         'hours_played' => 0,

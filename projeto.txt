@@ -1,0 +1,12 @@
+Playlog - backlog pessoal de jogos
+Web Avançada (B2) - 4º termo de Tecnologia em Desenvolvimento de Sistemas
+
+Integrantes:
+- Nicolas Pichiteli dos Santos - RA 221360
+- Thiago Panini Cassiano - RA 221228
+
+Estrutura:
+- Front-End/: interface em React (Vite)
+- Back-End/: API em Laravel com autenticação por token (Sanctum) e banco MySQL
+
+Instalação e execução: ver Back-End/README.md

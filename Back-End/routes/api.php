@@ -13,8 +13,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Biblioteca pessoal: /api/library e /api/library/{entry}, sempre restritas às entradas do usuário autenticado.
-    // Não existe rota que acesse a tabela de jogos diretamente.
+    // biblioteca: sempre filtrada pelo usuario logado
+    // nao tem rota direto pra tabela jogos
     Route::apiResource('library', LibraryController::class)
         ->parameters(['library' => 'entry'])
         ->where(['entry' => '[0-9]+']);

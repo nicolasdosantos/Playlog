@@ -19,7 +19,7 @@ const EMPTY_FORM = {
   rating: '',
 }
 
-// Converte a entrada que vem da API para os valores dos campos do formulário
+// converte a entrada da api pros campos do form
 function formFromEntry(entry) {
   return {
     title: entry.game.title,
@@ -44,7 +44,7 @@ function OptionGroup({ legend, options, selected, onToggle, emptyText }) {
         <div className="options__list">
           {options.map((option) => (
             <label key={option.id} className="option">
-              {/* Checkbox de verdade (teclado e leitor de tela), escondido atrás do visual do chip */}
+              {/* checkbox de verdade escondido atras do chip */}
               <input
                 className="option__input"
                 type="checkbox"
@@ -68,11 +68,14 @@ function GameFormPage() {
   const editing = Boolean(id)
   const navigate = useNavigate()
   const location = useLocation()
-  // Volta para a biblioteca com os mesmos filtros de antes, quando vier dela
+  // volta pra biblioteca (com os filtros) ou pra pagina do jogo
+  // libraryBack guarda a url da biblioteca quando vem da pagina do jogo
   const backTo = location.state?.back ?? '/'
+  const backState = { back: location.state?.libraryBack }
+  const backLabel = backTo.startsWith('/jogos/') ? 'Voltar ao jogo' : 'Voltar à biblioteca'
 
   const [form, setForm] = useState(EMPTY_FORM)
-  // A prévia da capa só muda quando a pessoa sai do campo, e não a cada letra digitada na URL
+  // previa da capa so atualiza quando sai do campo
   const [coverPreview, setCoverPreview] = useState('')
   const [options, setOptions] = useState({ genres: [], platforms: [] })
   const [loading, setLoading] = useState(true)
@@ -106,18 +109,18 @@ function GameFormPage() {
     }
   }, [editing, id])
 
-  // O aviso fica acima do formulário: quem enviou lá de baixo (no celular) precisa conseguir vê-lo
+  // rola ate o aviso (no celular ele fica longe do botao)
   useEffect(() => {
     if (message) messageRef.current?.scrollIntoView({ block: 'nearest' })
   }, [message])
 
-  // Ao editar um campo, o erro antigo dele some (o servidor valida de novo no próximo envio)
+  // limpa o erro do campo quando edita
   function handleChange(event) {
     setForm({ ...form, [event.target.name]: event.target.value })
     setErrors({ ...errors, [event.target.name]: undefined })
   }
 
-  // Marca ou desmarca um gênero/plataforma
+  // marca/desmarca genero ou plataforma
   function toggle(list, optionId) {
     const values = form[list].includes(optionId) ? form[list].filter((value) => value !== optionId) : [...form[list], optionId]
     setForm({ ...form, [list]: values })
@@ -134,7 +137,7 @@ function GameFormPage() {
       description: form.description || null,
       release_date: form.release_date || null,
       cover_url: form.cover_url || null,
-      // Aceita vírgula ou ponto (12,5 ou 12.5); a API espera ponto
+      // aceita virgula ou ponto, a api quer ponto
       hours_played: form.hours_played === '' ? 0 : form.hours_played.replace(',', '.'),
       rating: form.rating === '' ? null : Number(form.rating),
     }
@@ -146,7 +149,7 @@ function GameFormPage() {
         await api.createEntry(data)
       }
       const text = editing ? `Alterações salvas em "${data.title}".` : `"${data.title}" foi adicionado à sua biblioteca.`
-      navigate(backTo, { state: { notice: { type: 'success', text } } })
+      navigate(backTo, { state: { ...backState, notice: { type: 'success', text } } })
     } catch (error) {
       setErrors(error.errors)
       setMessage(error.message)
@@ -169,9 +172,9 @@ function GameFormPage() {
 
   return (
     <section className="form-page" aria-labelledby="form-title">
-      <Link to={backTo} className="back-link">
+      <Link to={backTo} state={backState} className="back-link">
         <Icon name="chevronLeft" size={16} />
-        Voltar à biblioteca
+        {backLabel}
       </Link>
 
       <div className="page-header">
@@ -228,7 +231,7 @@ function GameFormPage() {
 
             <div className="form__row">
               <Field label="Horas jogadas" hint="Até uma casa decimal, ex.: 12,5." error={errors.hours_played?.[0]}>
-                {/* Campo de texto: o type="number" descarta a vírgula quando o navegador está em inglês (12,5 virava 125) */}
+                {/* text e nao number: com o navegador em ingles o number zoava a virgula (12,5 virava 125) */}
                 <input className="input" name="hours_played" inputMode="decimal" value={form.hours_played} onChange={handleChange} />
               </Field>
 
@@ -296,7 +299,7 @@ function GameFormPage() {
             />
 
             <div className="form__actions">
-              <Link to={backTo} className="button button--ghost">
+              <Link to={backTo} state={backState} className="button button--ghost">
                 Cancelar
               </Link>
               <button type="submit" className="button button--primary" disabled={sending}>
@@ -307,7 +310,7 @@ function GameFormPage() {
 
           <aside className="game-form__preview" aria-label="Prévia do card">
             <p className="game-form__preview-label">Prévia</p>
-            {/* Se a URL não for uma imagem válida, o Cover mostra a capa com o título */}
+            {/* url quebrada mostra a capa com o titulo */}
             <Cover title={form.title} url={coverPreview} className="game-form__cover" />
             <p className="game-form__preview-title">{form.title.trim() || 'Sem título'}</p>
             <div className="game-form__preview-meta">

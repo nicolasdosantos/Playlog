@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('jogo_plataforma', function (Blueprint $table) {
             $table->foreignId('game_id')->constrained('jogos')->cascadeOnDelete();
-            // Uma plataforma ainda usada por algum jogo não pode ser excluída
+            // nao deixa apagar plataforma que ainda ta em uso
             $table->foreignId('platform_id')->constrained('plataformas')->restrictOnDelete();
 
             $table->primary(['game_id', 'platform_id']);

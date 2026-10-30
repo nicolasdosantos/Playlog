@@ -1,4 +1,4 @@
-// Ícones desenhados como SVG simples (traço de 2px), sem biblioteca externa
+// icones em svg, sem lib
 const PATHS = {
   plus: 'M12 5v14M5 12h14',
   edit: 'M4 20h4L19 9l-4-4L4 16v4ZM13.5 6.5l4 4',
@@ -8,9 +8,6 @@ const PATHS = {
   chevronRight: 'M9 5l7 7-7 7',
   check: 'M5 12.5l4.5 4.5L19 7.5',
   close: 'M6 6l12 12M18 6L6 18',
-  user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
-  mail: 'M4 6h16v12H4zM4 7l8 6 8-6',
-  lock: 'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4',
   search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM20 20l-4-4',
   clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5l3 2',
 }

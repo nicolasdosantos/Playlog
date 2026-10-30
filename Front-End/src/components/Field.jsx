@@ -1,6 +1,6 @@
 import { cloneElement, useId } from 'react'
 
-// Rótulo, dica e erro de um campo. O campo recebe o id e os atributos de acessibilidade automaticamente.
+// label, dica e erro do campo
 function Field({ label, error, hint, children }) {
   const id = useId()
   const describedBy = error ? `${id}-erro` : hint ? `${id}-dica` : undefined

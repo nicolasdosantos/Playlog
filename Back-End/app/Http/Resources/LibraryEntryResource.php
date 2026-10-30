@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-// O id é o da entrada (usado em /api/library/{id}); os dados do jogo ficam em "game"
+// o id aqui é o da entrada, não o do jogo
 class LibraryEntryResource extends JsonResource
 {
     /**
@@ -18,7 +18,7 @@ class LibraryEntryResource extends JsonResource
         return [
             'id' => $this->id,
             'status' => $this->status,
-            // O cast decimal:1 devolve texto ("12.5"); a API responde com número
+            // decimal:1 volta string, converte pra numero
             'hours_played' => (float) $this->hours_played,
             'rating' => $this->rating,
             'game' => new GameResource($this->whenLoaded('game')),

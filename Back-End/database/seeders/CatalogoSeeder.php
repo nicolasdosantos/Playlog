@@ -23,7 +23,7 @@ class CatalogoSeeder extends Seeder
      */
     public function run(): void
     {
-        // firstOrCreate só cria o que ainda não existe: rodar de novo não duplica nem altera registros
+        // firstOrCreate pra nao duplicar se rodar de novo
         foreach (self::GENEROS as $nome) {
             Genre::firstOrCreate(['name' => $nome]);
         }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('perfis', function (Blueprint $table) {
             $table->id();
-            // unique() garante o relacionamento 1:1: cada usuário tem no máximo um perfil
+            // unique = 1:1, cada usuario tem no maximo um perfil
             $table->foreignId('user_id')->unique()->constrained('usuarios')->cascadeOnDelete();
             $table->string('bio', 500)->nullable();
             $table->string('avatar_url')->nullable();

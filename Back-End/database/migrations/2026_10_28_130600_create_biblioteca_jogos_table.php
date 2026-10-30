@@ -15,9 +15,9 @@ return new class extends Migration
         Schema::create('biblioteca_jogos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('usuarios')->cascadeOnDelete();
-            // Um jogo que está na biblioteca de alguém não pode ser excluído
+            // nao deixa apagar jogo que ta numa biblioteca
             $table->foreignId('game_id')->constrained('jogos')->restrictOnDelete();
-            // Quero jogar, Jogando, Pausado, Concluído e Abandonado
+            // Quero jogar, Jogando, Pausado, Concluido e Abandonado
             $table->enum('status', ['want_to_play', 'playing', 'paused', 'completed', 'abandoned'])
                 ->default('want_to_play');
             $table->decimal('hours_played', 6, 1)->default(0);
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->unique(['user_id', 'game_id']);
         });
 
-        // O Schema Builder não tem método para CHECK, então as restrições são criadas com SQL
+        // o Schema nao tem CHECK, entao vai em SQL
         DB::statement('ALTER TABLE biblioteca_jogos ADD CONSTRAINT biblioteca_jogos_hours_played_check CHECK (hours_played >= 0)');
         DB::statement('ALTER TABLE biblioteca_jogos ADD CONSTRAINT biblioteca_jogos_rating_check CHECK (rating IS NULL OR rating BETWEEN 1 AND 5)');
     }

@@ -19,8 +19,8 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    // Endereços do front-end (Vite) que podem chamar a API, separados por vírgula.
-    // localhost e 127.0.0.1 são origens diferentes para o navegador, por isso os dois estão na lista.
+    // enderecos do front que podem chamar a api (separados por virgula)
+    // localhost e 127.0.0.1 contam como origens diferentes
     'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173')),
 
     'allowed_origins_patterns' => [],
@@ -29,7 +29,7 @@ return [
 
     'exposed_headers' => [],
 
-    // O navegador guarda a resposta da verificação (OPTIONS) por 1 hora em vez de repeti-la a cada requisição
+    // cache do preflight (OPTIONS) por 1h
     'max_age' => 60 * 60,
 
     'supports_credentials' => false,

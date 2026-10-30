@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -17,13 +18,14 @@ class AuthController extends Controller
         'email' => 'Informe um e-mail válido.',
         'email.unique' => 'Este e-mail já está cadastrado.',
         'password.min' => 'A senha deve ter pelo menos :min caracteres.',
-        'password.confirmed' => 'A confirmação da senha não confere.',
+        'password_confirmation.same' => 'A confirmação da senha não confere.',
     ];
 
     private const ATRIBUTOS = [
         'name' => 'nome',
         'email' => 'e-mail',
         'password' => 'senha',
+        'password_confirmation' => 'confirmação da senha',
     ];
 
     public function register(Request $request): JsonResponse
@@ -31,11 +33,13 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:usuarios,email'],
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            'password' => ['required', 'string', Password::defaults()],
+            // valida a confirmacao no proprio campo pro erro aparecer embaixo dele no form
+            'password_confirmation' => ['required', 'same:password'],
         ], self::MENSAGENS, self::ATRIBUTOS);
 
-        // O cast "hashed" do Model User gera o hash da senha antes de salvar
-        $user = User::create($data);
+        // o cast "hashed" do User ja faz o hash da senha
+        $user = User::create(Arr::except($data, 'password_confirmation'));
 
         return response()->json([
             'message' => 'Cadastro realizado com sucesso.',
@@ -53,7 +57,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
-        // A mesma mensagem para e-mail inexistente e senha errada, para não revelar quais e-mails estão cadastrados
+        // mesma msg nos dois casos pra nao entregar quais emails existem
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'E-mail ou senha inválidos.'], 401);
         }
@@ -72,7 +76,7 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        // Apaga só o token usado nesta requisição; os outros dispositivos continuam conectados
+        // apaga so o token atual
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logout realizado com sucesso.']);

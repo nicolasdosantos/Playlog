@@ -1,66 +1,47 @@
 import { Link } from 'react-router-dom'
 import Cover from './Cover'
 import Icon from './Icon'
+import Stars from './Stars'
 import StatusBadge from './StatusBadge'
+import { formatHours } from '../library'
 
 function GameCard({ entry, linkState, onDelete }) {
   const { game } = entry
-  const editUrl = `/jogos/${entry.id}/editar`
-  const year = game.release_date ? game.release_date.slice(0, 4) : 'Sem data'
-  const extraGenres = game.genres.length - 2
-  const platforms = game.platforms.map((platform) => platform.name).join(' · ')
-  const hours = Number(entry.hours_played).toLocaleString('pt-BR', { maximumFractionDigits: 1 })
 
   return (
     <article className="game-card">
       <div className="game-card__media">
         <Cover title={game.title} url={game.cover_url} className="game-card__cover" />
         <StatusBadge status={entry.status} className="game-card__status" />
-        {entry.rating === null ? (
-          <span className="game-card__rating game-card__rating--empty">Sem nota</span>
-        ) : (
-          <span className="game-card__rating" aria-label={`Nota ${entry.rating} de 10`}>
-            {entry.rating}
-            <small>/10</small>
-          </span>
-        )}
       </div>
 
       <div className="game-card__body">
-        <h3 className="game-card__title">
-          {/* O link cobre o card inteiro (ver .game-card__link::after no CSS) */}
-          <Link to={editUrl} state={linkState} className="game-card__link">
+        {/* titulo grande corta com ... e aparece inteiro no hover */}
+        <h3 className="game-card__title" title={game.title}>
+          {/* o link cobre o card todo (::after no css) */}
+          <Link to={`/jogos/${entry.id}`} state={linkState} className="game-card__link">
             {game.title}
           </Link>
         </h3>
-        <p className="game-card__meta">
-          <span>{year}</span>
+
+        <div className="game-card__info">
+          {entry.rating === null ? (
+            <span className="game-card__no-rating">Sem nota</span>
+          ) : (
+            <span className="game-card__rating">
+              <Stars rating={entry.rating} size={14} />
+              <span className="game-card__score">{entry.rating}/10</span>
+            </span>
+          )}
           <span className="game-card__hours">
             <Icon name="clock" size={14} />
-            {hours} h
+            {formatHours(entry.hours_played)} h
           </span>
-        </p>
-
-        {game.genres.length > 0 && (
-          <ul className="tags" aria-label="Gêneros">
-            {game.genres.slice(0, 2).map((genre) => (
-              <li key={genre.id} className="tag">
-                {genre.name}
-              </li>
-            ))}
-            {extraGenres > 0 && <li className="tag tag--more">+{extraGenres}</li>}
-          </ul>
-        )}
-
-        {platforms && (
-          <p className="game-card__platforms" title={platforms}>
-            {platforms}
-          </p>
-        )}
+        </div>
       </div>
 
       <div className="game-card__actions">
-        <Link to={editUrl} state={linkState} className="card-action">
+        <Link to={`/jogos/${entry.id}/editar`} state={linkState} className="card-action">
           <Icon name="edit" size={16} />
           Editar
         </Link>

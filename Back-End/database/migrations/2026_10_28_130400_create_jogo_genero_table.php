@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('jogo_genero', function (Blueprint $table) {
             $table->foreignId('game_id')->constrained('jogos')->cascadeOnDelete();
-            // Um gênero ainda usado por algum jogo não pode ser excluído
+            // nao deixa apagar genero que ainda ta em uso
             $table->foreignId('genre_id')->constrained('generos')->restrictOnDelete();
 
             $table->primary(['game_id', 'genre_id']);

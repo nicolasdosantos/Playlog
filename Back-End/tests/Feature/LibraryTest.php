@@ -31,7 +31,7 @@ class LibraryTest extends TestCase
         ], $alteracoes);
     }
 
-    // Cria direto no banco uma entrada na biblioteca do usuário, com o jogo dela
+    // cria a entrada direto no banco
     private function criarEntrada(User $user, array $jogo = [], array $pessoal = []): UserGame
     {
         $game = Game::create($this->dadosDoJogo($jogo));
@@ -96,7 +96,7 @@ class LibraryTest extends TestCase
             ->assertJsonPath('entry.game.cover_url', null)
             ->assertJsonPath('entry.game.genres', []);
 
-        // Títulos repetidos são permitidos
+        // pode repetir titulo
         $this->postJson('/api/library', ['title' => 'Celeste'])->assertCreated();
         $this->assertDatabaseCount('biblioteca_jogos', 2);
     }
@@ -187,7 +187,7 @@ class LibraryTest extends TestCase
 
         $this->getJson('/api/library?search=zelda')->assertOk()->assertJsonCount(0, 'data');
 
-        // Filtros enviados como lista são recusados com 422, e não com erro 500
+        // filtro como lista tem que dar 422 e nao 500
         $this->getJson('/api/library?search[]=knight')->assertUnprocessable()->assertJsonValidationErrors('search');
         $this->getJson('/api/library?genre[]=1')->assertUnprocessable()->assertJsonValidationErrors('genre');
     }
@@ -217,6 +217,36 @@ class LibraryTest extends TestCase
 
         $this->getJson("/api/library?genre={$rpg->id}")->assertJsonCount(1, 'data')->assertJsonPath('data.0.game.title', 'Persona 5');
         $this->getJson("/api/library?platform={$switch->id}")->assertJsonCount(1, 'data')->assertJsonPath('data.0.game.title', 'Celeste');
+    }
+
+    public function test_filtro_com_status_invalido_retorna_422(): void
+    {
+        $user = $this->autenticar();
+        $this->criarEntrada($user, [], ['status' => 'completed']);
+
+        $this->getJson('/api/library?status=terminado')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['status' => 'O status do filtro é inválido.']);
+
+        $this->getJson('/api/library?status[]=completed')->assertUnprocessable()->assertJsonValidationErrors('status');
+
+        $this->getJson('/api/library?status=completed')->assertOk()->assertJsonCount(1, 'data');
+    }
+
+    // o front usa current_page > last_page pra voltar pra ultima pagina
+    public function test_pagina_alem_da_ultima_informa_qual_e_a_ultima(): void
+    {
+        $user = $this->autenticar();
+        for ($i = 1; $i <= 16; $i++) {
+            $this->criarEntrada($user, ['title' => "Jogo $i"]);
+        }
+
+        $this->getJson('/api/library?page=99')
+            ->assertOk()
+            ->assertJsonCount(0, 'data')
+            ->assertJsonPath('meta.current_page', 99)
+            ->assertJsonPath('meta.last_page', 2)
+            ->assertJsonPath('meta.total', 16);
     }
 
     public function test_consulta_de_entrada(): void

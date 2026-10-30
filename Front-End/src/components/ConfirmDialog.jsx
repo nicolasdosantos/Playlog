@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-// Janela de confirmação feita com o <dialog> do HTML, que já prende o foco e fecha com Esc
+// confirmacao usando o <dialog> do html
 function ConfirmDialog({ open, title, children, confirmLabel, busy, onConfirm, onCancel }) {
   const dialogRef = useRef(null)
 
@@ -11,7 +11,7 @@ function ConfirmDialog({ open, title, children, confirmLabel, busy, onConfirm, o
   }, [open])
 
   function handleCancel(event) {
-    // Esc fecha o dialog sozinho; aqui quem decide é o estado do React
+    // o esc fecha sozinho, entao controla pelo estado
     event.preventDefault()
     if (!busy) onCancel()
   }
